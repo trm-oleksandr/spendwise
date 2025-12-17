@@ -23,9 +23,9 @@ public class AppConfig {
         Properties properties = loadProperties();
 
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(properties.getProperty("url"));
-        hikariConfig.setUsername(properties.getProperty("user"));
-        hikariConfig.setPassword(properties.getProperty("password"));
+        hikariConfig.setJdbcUrl(properties.getProperty("db.url"));
+        hikariConfig.setUsername(properties.getProperty("db.user"));
+        hikariConfig.setPassword(properties.getProperty("db.password"));
 
         this.dataSource = new HikariDataSource(hikariConfig);
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
@@ -71,8 +71,8 @@ public class AppConfig {
     }
 
     private void validateRequiredProperties(Properties properties) {
-        Objects.requireNonNull(properties.getProperty("url"), "Database URL (url) must be provided");
-        Objects.requireNonNull(properties.getProperty("user"), "Database user (user) must be provided");
-        Objects.requireNonNull(properties.getProperty("password"), "Database password (password) must be provided");
+        Objects.requireNonNull(properties.getProperty("db.url"), "Database URL (db.url) must be provided");
+        Objects.requireNonNull(properties.getProperty("db.user"), "Database user (db.user) must be provided");
+        Objects.requireNonNull(properties.getProperty("db.password"), "Database password (db.password) must be provided");
     }
 }
