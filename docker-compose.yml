@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: spendwise-db
+    environment:
+      POSTGRES_DB: spendwise
+      POSTGRES_USER: spendwise
+      POSTGRES_PASSWORD: spendwise
+    ports:
+      - "5432:5432"
+    volumes:
+      - spendwise_pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spendwise"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  spendwise_pgdata:
