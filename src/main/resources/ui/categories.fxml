@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="sk.upjs.ics.spendwise.ui.controller.CategoriesController">
+    <padding>
+        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+    </padding>
+    <center>
+        <TableView fx:id="categoriesTable">
+            <columns>
+                <TableColumn fx:id="nameCol" text="Name" />
+                <TableColumn fx:id="typeCol" text="Type" />
+            </columns>
+        </TableView>
+    </center>
+    <right>
+        <VBox spacing="10.0">
+            <children>
+                <TextField fx:id="nameField" promptText="Name" />
+                <ComboBox fx:id="typeBox" />
+                <HBox spacing="10.0">
+                    <children>
+                        <Button text="Add" onAction="#onAdd" />
+                        <Button text="Update" onAction="#onUpdate" />
+                        <Button text="Delete" onAction="#onDelete" />
+                        <Button text="Back" onAction="#onBack" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </right>
+</BorderPane>
