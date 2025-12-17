@@ -1,12 +1,13 @@
 package sk.upjs.ics.spendwise.entity;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.Objects;
 
 public class AppUser {
-    private long id;
+    private Long id;
     private String username;
     private String passwordHash;
-    private Instant createdAt;
+    private OffsetDateTime createdAt;
 
     public AppUser() {
     }
@@ -59,9 +60,9 @@ public class AppUser {
             return false;
         }
         return Objects.equals(id, appUser.id)
-            && Objects.equals(username, appUser.username)
-            && Objects.equals(passwordHash, appUser.passwordHash)
-            && Objects.equals(createdAt, appUser.createdAt);
+                && Objects.equals(username, appUser.username)
+                && Objects.equals(passwordHash, appUser.passwordHash)
+                && Objects.equals(createdAt, appUser.createdAt);
     }
 
     @Override
@@ -72,9 +73,9 @@ public class AppUser {
     @Override
     public String toString() {
         return "AppUser{"
-            + "id=" + id
-            + ", username='" + username + '\''
-            + ", createdAt=" + createdAt
-            + '}';
+                + "id=" + id
+                + ", username='" + username + '\''
+                + ", createdAt=" + createdAt
+                + '}';
     }
 }

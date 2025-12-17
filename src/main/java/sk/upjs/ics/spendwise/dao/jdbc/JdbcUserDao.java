@@ -21,23 +21,23 @@ public class JdbcUserDao implements UserDao {
     @Override
     public AppUser create(AppUser user) {
         return jdbcTemplate.queryForObject(
-            """
-                INSERT INTO app_user (username, password_hash)
-                VALUES (?, ?)
-                RETURNING id, username, password_hash, created_at
-                """,
-            userRowMapper(),
-            user.getUsername(),
-            user.getPasswordHash()
+                """
+                    INSERT INTO app_user (username, password_hash)
+                    VALUES (?, ?)
+                    RETURNING id, username, password_hash, created_at
+                    """,
+                userRowMapper(),
+                user.getUsername(),
+                user.getPasswordHash()
         );
     }
 
     @Override
     public Optional<AppUser> findByUsername(String username) {
         List<AppUser> users = jdbcTemplate.query(
-            "SELECT id, username, password_hash, created_at FROM app_user WHERE username = ?",
-            userRowMapper(),
-            username
+                "SELECT id, username, password_hash, created_at FROM app_user WHERE username = ?",
+                userRowMapper(),
+                username
         );
         return users.stream().findFirst();
     }
@@ -45,9 +45,9 @@ public class JdbcUserDao implements UserDao {
     @Override
     public boolean existsByUsername(String username) {
         Boolean exists = jdbcTemplate.queryForObject(
-            "SELECT EXISTS (SELECT 1 FROM app_user WHERE username = ?)",
-            Boolean.class,
-            username
+                "SELECT EXISTS (SELECT 1 FROM app_user WHERE username = ?)",
+                Boolean.class,
+                username
         );
         return Boolean.TRUE.equals(exists);
     }
