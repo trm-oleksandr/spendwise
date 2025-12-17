@@ -11,18 +11,18 @@ public class AppUser {
     public AppUser() {
     }
 
-    public AppUser(long id, String username, String passwordHash, Instant createdAt) {
+    public AppUser(Long id, String username, String passwordHash, OffsetDateTime createdAt) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
         this.createdAt = createdAt;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -42,21 +42,39 @@ public class AppUser {
         this.passwordHash = passwordHash;
     }
 
-    public Instant getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AppUser appUser)) {
+            return false;
+        }
+        return Objects.equals(id, appUser.id)
+            && Objects.equals(username, appUser.username)
+            && Objects.equals(passwordHash, appUser.passwordHash)
+            && Objects.equals(createdAt, appUser.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, passwordHash, createdAt);
+    }
+
+    @Override
     public String toString() {
-        return "AppUser{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
+        return "AppUser{"
+            + "id=" + id
+            + ", username='" + username + '\''
+            + ", createdAt=" + createdAt
+            + '}';
     }
 }
-
