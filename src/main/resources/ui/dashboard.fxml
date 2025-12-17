@@ -17,6 +17,9 @@
         <VBox spacing="10.0">
             <children>
                 <Label fx:id="helloLabel" text="Hello" />
+                <Button text="Transactions" onAction="#onGoToTransactions" />
+                <Button text="Accounts" onAction="#onGoToAccounts" />
+                <Button text="Categories" onAction="#onGoToCategories" />
             </children>
         </VBox>
     </center>
