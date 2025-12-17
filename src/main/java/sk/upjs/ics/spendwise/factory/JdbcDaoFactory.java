@@ -21,7 +21,7 @@ public class JdbcDaoFactory implements DaoFactory {
 
     public synchronized JdbcUserDao getUserDao() {
         if (userDao == null) {
-            JdbcTemplate jdbcTemplate = AppConfig.getJdbcTemplate();
+            JdbcTemplate jdbcTemplate = AppConfig.getInstance().getJdbcTemplate();
             userDao = new JdbcUserDao(jdbcTemplate);
         }
         return userDao;
