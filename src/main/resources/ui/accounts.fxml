@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="sk.upjs.ics.spendwise.ui.controller.AccountsController">
+    <padding>
+        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+    </padding>
+    <top>
+        <Label text="Accounts" style="-fx-font-size: 20px; -fx-font-weight: bold;" BorderPane.alignment="CENTER_LEFT" />
+    </top>
+    <center>
+        <TableView fx:id="accountsTable">
+            <columns>
+                <TableColumn fx:id="nameCol" text="Name" />
+                <TableColumn fx:id="currencyCol" text="Currency" />
+            </columns>
+        </TableView>
+    </center>
+    <right>
+        <VBox spacing="10.0">
+            <children>
+                <TextField fx:id="nameField" promptText="Name" />
+                <TextField fx:id="currencyField" promptText="Currency" />
+                <HBox spacing="10.0">
+                    <children>
+                        <Button text="Add" onAction="#onAdd" />
+                        <Button text="Update" onAction="#onUpdate" />
+                        <Button text="Delete" onAction="#onDelete" />
+                        <Button text="Back" onAction="#onBack" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </right>
+</BorderPane>
