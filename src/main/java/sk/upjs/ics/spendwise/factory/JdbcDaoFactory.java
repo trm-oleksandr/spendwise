@@ -2,9 +2,10 @@ package sk.upjs.ics.spendwise.factory;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import sk.upjs.ics.spendwise.config.AppConfig;
+import sk.upjs.ics.spendwise.dao.UserDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcUserDao;
 
-public class JdbcDaoFactory {
+public class JdbcDaoFactory implements DaoFactory {
     private static JdbcDaoFactory instance;
     private JdbcUserDao userDao;
 
@@ -24,5 +25,10 @@ public class JdbcDaoFactory {
             userDao = new JdbcUserDao(jdbcTemplate);
         }
         return userDao;
+    }
+
+    @Override
+    public UserDao userDao() {
+        return getUserDao();
     }
 }
