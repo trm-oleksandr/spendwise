@@ -1,5 +1,6 @@
 package sk.upjs.ics.spendwise.ui.controller;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -7,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -17,6 +20,10 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import sk.upjs.ics.spendwise.dao.AccountDao;
 import sk.upjs.ics.spendwise.dao.CategoryDao;
 import sk.upjs.ics.spendwise.dao.TransactionDao;
@@ -28,6 +35,7 @@ import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.factory.DaoFactory;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
+import sk.upjs.ics.spendwise.ui.controller.TransactionEditController;
 import sk.upjs.ics.spendwise.ui.model.TransactionRow;
 import sk.upjs.ics.spendwise.ui.util.Alerts;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
@@ -117,12 +125,32 @@ public class TransactionsController {
 
     @FXML
     private void onAdd(ActionEvent event) {
-        Alerts.info("TODO", "Adding transactions will be implemented soon.");
+        AppUser currentUser = AuthContext.getCurrentUser();
+        if (currentUser == null) {
+            SceneSwitcher.switchTo("ui/login.fxml");
+            return;
+        }
+
+        openTransactionEditor(TransactionEditController::initCreate);
+        refreshTable();
     }
 
     @FXML
     private void onEdit(ActionEvent event) {
-        Alerts.info("TODO", "Editing transactions will be implemented soon.");
+        AppUser currentUser = AuthContext.getCurrentUser();
+        if (currentUser == null) {
+            SceneSwitcher.switchTo("ui/login.fxml");
+            return;
+        }
+
+        TransactionRow selected = transactionsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alerts.error("No selection", "Please select a transaction to edit.");
+            return;
+        }
+
+        openTransactionEditor(controller -> controller.initEdit(selected.getId()));
+        refreshTable();
     }
 
     @FXML
@@ -231,6 +259,25 @@ public class TransactionsController {
         }
         if (toDatePicker.getValue() == null) {
             toDatePicker.setValue(currentMonth.atEndOfMonth());
+        }
+    }
+
+    private void openTransactionEditor(Consumer<TransactionEditController> initializer) {
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ui/transaction_edit.fxml"));
+
+        try {
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+
+            TransactionEditController controller = loader.getController();
+            controller.setStage(stage);
+            initializer.accept(controller);
+
+            stage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to open transaction editor", e);
         }
     }
 }
