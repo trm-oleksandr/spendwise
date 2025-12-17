@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="sk.upjs.ics.spendwise.ui.controller.TransactionsController">
+    <padding>
+        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
+    </padding>
+    <top>
+        <VBox spacing="10.0">
+            <children>
+                <Label text="Transactions" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+                <HBox spacing="10.0">
+                    <children>
+                        <DatePicker fx:id="fromDatePicker" />
+                        <DatePicker fx:id="toDatePicker" />
+                        <ComboBox fx:id="accountFilterBox" promptText="All" />
+                        <ComboBox fx:id="categoryFilterBox" promptText="All" />
+                        <ComboBox fx:id="typeFilterBox">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="ALL" />
+                                    <String fx:value="INCOME" />
+                                    <String fx:value="EXPENSE" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                        <Button text="Apply" onAction="#onApplyFilters" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <TableView fx:id="transactionsTable">
+            <columns>
+                <TableColumn fx:id="dateCol" text="Date" />
+                <TableColumn fx:id="accountCol" text="Account" />
+                <TableColumn fx:id="categoryCol" text="Category" />
+                <TableColumn fx:id="typeCol" text="Type" />
+                <TableColumn fx:id="amountCol" text="Amount" />
+                <TableColumn fx:id="noteCol" text="Note" />
+            </columns>
+        </TableView>
+    </center>
+    <bottom>
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Add" onAction="#onAdd" />
+                <Button text="Edit" onAction="#onEdit" />
+                <Button text="Delete" onAction="#onDelete" />
+                <Button text="Back" onAction="#onBack" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
