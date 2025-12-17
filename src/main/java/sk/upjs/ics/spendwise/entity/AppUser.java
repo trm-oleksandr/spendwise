@@ -1,13 +1,12 @@
 package sk.upjs.ics.spendwise.entity;
 
-import java.time.OffsetDateTime;
-import java.util.Objects;
+import java.time.Instant;
 
 public class AppUser {
-    private Long id;
+    private long id;
     private String username;
     private String passwordHash;
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     public AppUser() {
     }
