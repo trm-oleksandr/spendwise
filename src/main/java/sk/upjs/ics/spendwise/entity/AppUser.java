@@ -75,7 +75,6 @@ public class AppUser {
         return "AppUser{"
             + "id=" + id
             + ", username='" + username + '\''
-            + ", passwordHash='" + passwordHash + '\''
             + ", createdAt=" + createdAt
             + '}';
     }
