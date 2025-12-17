@@ -28,4 +28,19 @@ public class DashboardController {
         AuthContext.clear();
         SceneSwitcher.switchTo("ui/login.fxml");
     }
+
+    @FXML
+    private void onGoToTransactions(ActionEvent event) {
+        SceneSwitcher.switchTo("ui/transactions.fxml");
+    }
+
+    @FXML
+    private void onGoToAccounts(ActionEvent event) {
+        SceneSwitcher.switchTo("ui/accounts.fxml");
+    }
+
+    @FXML
+    private void onGoToCategories(ActionEvent event) {
+        SceneSwitcher.switchTo("ui/categories.fxml");
+    }
 }
