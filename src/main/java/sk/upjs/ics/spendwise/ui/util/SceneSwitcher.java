@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sk.upjs.ics.spendwise.security.AuthContext;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
@@ -36,6 +38,10 @@ public class SceneSwitcher {
         return currentLocale;
     }
 
+    public static Scene getScene() {
+        return primaryStage == null ? null : primaryStage.getScene();
+    }
+
     public static void switchScene(Event event, String fxmlPath, String title) {
         switchInternal(fxmlPath, title);
     }
@@ -51,6 +57,11 @@ public class SceneSwitcher {
 
     private static void switchInternal(String fxmlPath, String title) {
         try {
+            if (requiresAuthentication(fxmlPath) && AuthContext.getCurrentUser() == null) {
+                fxmlPath = "/ui/login.fxml";
+                title = "Login";
+            }
+
             URL resource = SceneSwitcher.class.getResource(fxmlPath);
             if (resource == null) {
                 String filename = fxmlPath.substring(fxmlPath.lastIndexOf('/') + 1);
@@ -79,6 +90,8 @@ public class SceneSwitcher {
                     scene.setRoot(root);
                 }
 
+                ThemeManager.applyTheme(scene);
+
                 primaryStage.setTitle(title.isEmpty() ? "SpendWise" : "SpendWise - " + title);
                 primaryStage.show();
             }
@@ -86,5 +99,10 @@ public class SceneSwitcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean requiresAuthentication(String fxmlPath) {
+        String normalized = fxmlPath.toLowerCase(Locale.ROOT);
+        return !(normalized.contains("login.fxml") || normalized.contains("register.fxml"));
     }
 }
