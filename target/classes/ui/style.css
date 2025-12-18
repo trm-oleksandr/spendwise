@@ -1,0 +1,111 @@
+/* Глобальный фон - Однотонный матовый (как Gemini Dark) */
+.root {
+    -fx-background-color: #1e1e1e;
+    -fx-font-family: 'Segoe UI', sans-serif;
+}
+
+/* Текст */
+.label {
+    -fx-text-fill: #e0e0e0; /* Светло-серый текст */
+    -fx-font-size: 14px;
+}
+
+/* Крупные заголовки */
+.header-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+/* Кнопки - Строгий стиль */
+.button {
+    -fx-background-color: #2b2b2b; /* Чуть светлее фона */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-border-color: #4a4a4a; /* Явная рамка */
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+}
+.button:hover {
+    -fx-background-color: #3a3a3a;
+    -fx-border-color: #666666;
+}
+.button:pressed {
+    -fx-background-color: #141414;
+}
+
+/* Зеленая кнопка (Primary) */
+.button-primary {
+    -fx-background-color: #2e7d32; /* Темно-зеленый (Google style) */
+    -fx-text-fill: white;
+    -fx-border-color: #1b5e20;
+}
+.button-primary:hover {
+    -fx-background-color: #388e3c;
+}
+
+/* Красная кнопка (Danger) */
+.button-danger {
+    -fx-background-color: #c62828;
+    -fx-text-fill: white;
+    -fx-border-color: #b71c1c;
+}
+.button-danger:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* Поля ввода (Input) - Контрастные */
+.text-field, .password-field, .text-area, .combo-box, .date-picker .text-field {
+    -fx-background-color: #252526; /* Очень темный, но отличается от фона */
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #808080;
+    -fx-background-radius: 4;
+    -fx-border-color: #555555; /* Серая рамка обязательна */
+    -fx-border-radius: 4;
+}
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: #4da6ff; /* Синяя обводка при фокусе */
+    -fx-background-color: #2b2b2b;
+}
+
+/* Контейнеры фильтров (чтобы фон не был белым) */
+.filter-bar {
+    -fx-background-color: #252526;
+    -fx-background-radius: 6;
+    -fx-border-color: #3e3e42;
+    -fx-border-radius: 6;
+    -fx-padding: 10;
+}
+
+/* Таблицы */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #3e3e42;
+    -fx-border-radius: 4;
+}
+.table-view .column-header-background {
+    -fx-background-color: #252526;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #3e3e42;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+.table-row-cell {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent #2d2d2d transparent; /* Разделители строк */
+}
+.table-row-cell:odd {
+    -fx-background-color: #232323; /* Чередование строк */
+}
+.table-row-cell:selected {
+    -fx-background-color: #0d293e; /* Темно-синий при выборе */
+}
+/* Пустая таблица */
+.table-view .placeholder .label {
+    -fx-text-fill: #666666;
+}

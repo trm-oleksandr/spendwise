@@ -7,24 +7,25 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sk.upjs.ics.spendwise.ui.controller.DashboardController">
+<AnchorPane prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sk.upjs.ics.spendwise.ui.controller.DashboardController">
     <children>
-        <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox alignment="CENTER" spacing="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Label text="SpendWise Dashboard">
-                    <font>
-                        <Font name="System Bold" size="28.0" />
-                    </font>
-                </Label>
-                <Label text="Welcome back!" textFill="#6b6b6b" />
+                <Label styleClass="header-label" text="SpendWise Dashboard" />
 
-                <Button fx:id="accountsBtn" mnemonicParsing="false" onAction="#showAccounts" prefHeight="40.0" prefWidth="200.0" text="My Accounts" />
-                <Button fx:id="transactionsBtn" mnemonicParsing="false" onAction="#showTransactions" prefHeight="40.0" prefWidth="200.0" text="Transactions" />
-                <Button fx:id="categoriesBtn" mnemonicParsing="false" onAction="#showCategories" prefHeight="40.0" prefWidth="200.0" text="Categories" />
+                <Label style="-fx-font-size: 16px; -fx-text-fill: #aaaaaa;" text="Welcome back to your financial center" />
 
-                <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#logout" style="-fx-background-color: #ffcccc;" text="Logout">
+                <VBox alignment="CENTER" maxWidth="300.0" spacing="15.0">
+                    <children>
+                        <Button fx:id="accountsBtn" maxWidth="Infinity" mnemonicParsing="false" onAction="#showAccounts" prefHeight="50.0" text="My Accounts" />
+                        <Button fx:id="categoriesBtn" maxWidth="Infinity" mnemonicParsing="false" onAction="#showCategories" prefHeight="50.0" text="Manage Categories" />
+                        <Button fx:id="transactionsBtn" maxWidth="Infinity" mnemonicParsing="false" onAction="#showTransactions" prefHeight="60.0" styleClass="button-primary" text="Transactions" />
+                    </children>
+                </VBox>
+
+                <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#logout" styleClass="button-danger" text="Logout">
                     <VBox.margin>
-                        <Insets top="20.0" />
+                        <Insets top="30.0" />
                     </VBox.margin>
                 </Button>
             </children>
