@@ -8,12 +8,11 @@ public class Transaction {
     private Long userId;
     private Long accountId;
     private Long categoryId;
-    private BigDecimal amount; // Используем BigDecimal для денег!
+    private BigDecimal amount;
     private Instant occurredAt; // Когда произошла транзакция
     private String note;
     private Instant createdAt;
 
-    // Поля для удобства отображения в таблице (не хранятся в БД, заполняются JOIN-ом)
     private String accountName;
     private String categoryName;
     private CategoryType type;
@@ -85,7 +84,6 @@ public class Transaction {
         this.createdAt = createdAt;
     }
 
-    // Getters/Setters для дополнительных полей
     public String getAccountName() {
         return accountName;
     }

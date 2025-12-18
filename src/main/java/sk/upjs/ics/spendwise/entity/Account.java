@@ -6,14 +6,13 @@ public class Account {
     private Long id;
     private Long userId;
     private String name;
-    private String currency; // Например "EUR"
+    private String currency;
     private Instant createdAt;
 
-    // Пустой конструктор (нужен для RowMapper)
+    // Пустой (nees for RowMapper)
     public Account() {
     }
 
-    // Полный конструктор
     public Account(Long id, Long userId, String name, String currency, Instant createdAt) {
         this.id = id;
         this.userId = userId;
@@ -22,7 +21,7 @@ public class Account {
         this.createdAt = createdAt;
     }
 
-    // Getters & Setters
+    // Getters Setters
     public Long getId() {
         return id;
     }
