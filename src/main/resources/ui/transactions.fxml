@@ -17,6 +17,11 @@
                 <HBox alignment="CENTER_LEFT" spacing="20.0">
                     <children>
                         <Label styleClass="header-label" text="%transactions.title" />
+                        <Label fx:id="totalLabel" text="Total: 0.00 €" textFill="#aaaaaa">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
                     </children>
                 </HBox>
 
