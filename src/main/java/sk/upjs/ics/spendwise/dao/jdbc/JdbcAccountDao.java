@@ -60,7 +60,7 @@ public class JdbcAccountDao implements AccountDao {
                 ps.setString(3, account.getCurrency());
                 return ps;
             }, keyHolder);
-            account.setId(keyHolder.getKey().longValue());
+            account.setId(((Number) keyHolder.getKeys().get("id")).longValue());
             // Обновляем created_at из БД (опционально, но полезно)
             return getById(account.getId()).orElse(account);
         } else {

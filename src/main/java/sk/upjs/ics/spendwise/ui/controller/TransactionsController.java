@@ -43,7 +43,8 @@ public class TransactionsController {
     private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
     private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
 
-    private final Long currentUserId = 1L; // Хардкод ID, так как AuthContext не подключен
+    // Заглушка, пока не подключим AuthContext
+    private final Long currentUserId = 1L;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
@@ -61,7 +62,7 @@ public class TransactionsController {
         loadFilters();
         refreshTable();
 
-        // События
+        // Фильтры
         accountFilter.setOnAction(e -> refreshTable());
         categoryFilter.setOnAction(e -> refreshTable());
 
@@ -71,10 +72,11 @@ public class TransactionsController {
             refreshTable();
         });
 
+        // Навигация
         backBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/dashboard.fxml", "Dashboard"));
-
         addBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/transaction_edit.fxml", "New Transaction"));
 
+        // Удаление
         deleteBtn.setOnAction(e -> {
             Transaction selected = transactionsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -105,7 +107,6 @@ public class TransactionsController {
 
             transactionsTable.setItems(FXCollections.observableArrayList(filtered));
 
-            // Подсчет суммы
             BigDecimal total = filtered.stream()
                     .map(Transaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);

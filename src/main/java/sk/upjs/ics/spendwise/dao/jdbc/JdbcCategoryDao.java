@@ -58,7 +58,9 @@ public class JdbcCategoryDao implements CategoryDao {
                 ps.setString(3, category.getType().name());
                 return ps;
             }, keyHolder);
-            category.setId(keyHolder.getKey().longValue());
+
+            category.setId(((Number) keyHolder.getKeys().get("id")).longValue());
+
             return category;
         } else {
             String sql = "UPDATE category SET name = ?, type = ? WHERE id = ?";

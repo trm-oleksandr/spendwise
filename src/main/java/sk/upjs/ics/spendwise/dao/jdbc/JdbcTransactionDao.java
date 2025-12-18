@@ -85,7 +85,7 @@ public class JdbcTransactionDao implements TransactionDao {
                 ps.setString(6, t.getNote());
                 return ps;
             }, keyHolder);
-            t.setId(keyHolder.getKey().longValue());
+            t.setId(((Number) keyHolder.getKeys().get("id")).longValue());
             return getById(t.getId()).orElse(t);
         } else {
             String sql = "UPDATE txn SET account_id=?, category_id=?, amount=?, occurred_at=?, note=? WHERE id=?";
