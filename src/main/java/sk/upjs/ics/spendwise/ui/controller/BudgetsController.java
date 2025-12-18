@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Budget;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.BudgetService;
@@ -37,8 +38,8 @@ public class BudgetsController {
     @FXML private Button deleteBtn;
     @FXML private Button backBtn;
 
-    private final BudgetService budgetService = new BudgetService();
-    private final AccountService accountService = new AccountService();
+    private final BudgetService budgetService = DefaultServiceFactory.INSTANCE.budgetService();
+    private final AccountService accountService = DefaultServiceFactory.INSTANCE.accountService();
 
     @FXML
     public void initialize() {

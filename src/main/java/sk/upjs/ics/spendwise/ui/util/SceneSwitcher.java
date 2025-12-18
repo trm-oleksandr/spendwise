@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sk.upjs.ics.spendwise.security.AuthContext;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
@@ -13,18 +15,17 @@ import java.util.ResourceBundle;
 public class SceneSwitcher {
 
     private static Stage primaryStage;
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 700;
+    private static final int MIN_WIDTH = 900;
+    private static final int MIN_HEIGHT = 650;
 
     // По умолчанию Английский
     private static Locale currentLocale = new Locale("en");
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
-        primaryStage.setMinWidth(WIDTH);
-        primaryStage.setMinHeight(HEIGHT);
-        primaryStage.setWidth(WIDTH);
-        primaryStage.setHeight(HEIGHT);
+        primaryStage.setMinWidth(MIN_WIDTH);
+        primaryStage.setMinHeight(MIN_HEIGHT);
+        primaryStage.setResizable(true);
     }
 
     // Метод для смены языка
@@ -35,6 +36,10 @@ public class SceneSwitcher {
 
     public static Locale getCurrentLocale() {
         return currentLocale;
+    }
+
+    public static Scene getScene() {
+        return primaryStage == null ? null : primaryStage.getScene();
     }
 
     public static void switchScene(Event event, String fxmlPath, String title) {
@@ -52,6 +57,11 @@ public class SceneSwitcher {
 
     private static void switchInternal(String fxmlPath, String title) {
         try {
+            if (requiresAuthentication(fxmlPath) && AuthContext.getCurrentUser() == null) {
+                fxmlPath = "/ui/login.fxml";
+                title = "Login";
+            }
+
             URL resource = SceneSwitcher.class.getResource(fxmlPath);
             if (resource == null) {
                 String filename = fxmlPath.substring(fxmlPath.lastIndexOf('/') + 1);
@@ -73,11 +83,14 @@ public class SceneSwitcher {
             if (primaryStage != null) {
                 Scene scene = primaryStage.getScene();
                 if (scene == null) {
-                    scene = new Scene(root, WIDTH, HEIGHT);
+                    scene = new Scene(root);
                     primaryStage.setScene(scene);
+                    primaryStage.sizeToScene();
                 } else {
                     scene.setRoot(root);
                 }
+
+                ThemeManager.applyTheme(scene);
 
                 primaryStage.setTitle(title.isEmpty() ? "SpendWise" : "SpendWise - " + title);
                 primaryStage.show();
@@ -86,5 +99,10 @@ public class SceneSwitcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean requiresAuthentication(String fxmlPath) {
+        String normalized = fxmlPath.toLowerCase(Locale.ROOT);
+        return !(normalized.contains("login.fxml") || normalized.contains("register.fxml"));
     }
 }

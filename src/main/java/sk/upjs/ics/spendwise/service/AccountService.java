@@ -7,7 +7,15 @@ import java.util.List;
 
 public class AccountService {
 
-    private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
+    private final AccountDao accountDao;
+
+    public AccountService() {
+        this(JdbcDaoFactory.INSTANCE.accountDao());
+    }
+
+    public AccountService(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
 
     public List<Account> getAll(Long userId) {
         return accountDao.getAll(userId);
