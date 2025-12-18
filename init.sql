@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS budget;
 DROP TABLE IF EXISTS txn;
 DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS account;
@@ -38,4 +39,19 @@ CREATE TABLE txn (
                      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Индексы
 CREATE INDEX idx_txn_user_date ON txn(user_id, occurred_at);
+
+-- Бюджеты по счетам (период произвольный)
+CREATE TABLE budget (
+                        id BIGSERIAL PRIMARY KEY,
+                        user_id BIGINT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+                        account_id BIGINT NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+                        limit_amount NUMERIC(12,2) NOT NULL CHECK (limit_amount > 0),
+                        start_date DATE NOT NULL,
+                        end_date DATE NOT NULL,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        CHECK (start_date <= end_date)
+);
+
+CREATE INDEX idx_budget_user_account ON budget(user_id, account_id);

@@ -3,13 +3,14 @@ package sk.upjs.ics.spendwise.ui.controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import sk.upjs.ics.spendwise.dao.AccountDao;
-import sk.upjs.ics.spendwise.dao.CategoryDao;
-import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.Transaction;
-import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
+import sk.upjs.ics.spendwise.security.AuthContext;
+import sk.upjs.ics.spendwise.service.AccountService;
+import sk.upjs.ics.spendwise.service.CategoryService;
+import sk.upjs.ics.spendwise.service.TransactionService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -26,16 +27,14 @@ public class TransactionEditController {
     @FXML private Button saveBtn;
     @FXML private Button cancelBtn;
 
-    private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
-    private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
-    private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
-
-    private final Long currentUserId = 1L;
+    private final TransactionService transactionService = DefaultServiceFactory.INSTANCE.transactionService();
+    private final AccountService accountService = DefaultServiceFactory.INSTANCE.accountService();
+    private final CategoryService categoryService = DefaultServiceFactory.INSTANCE.categoryService();
 
     @FXML
     public void initialize() {
-        accountComboBox.setItems(FXCollections.observableArrayList(accountDao.getAll(currentUserId)));
-        categoryComboBox.setItems(FXCollections.observableArrayList(categoryDao.getAll(currentUserId)));
+        accountComboBox.setItems(FXCollections.observableArrayList(accountService.getAll(getCurrentUserId())));
+        categoryComboBox.setItems(FXCollections.observableArrayList(categoryService.getAll(getCurrentUserId())));
         datePicker.setValue(LocalDate.now());
 
         cancelBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/transactions.fxml", "Transactions"));
@@ -53,14 +52,14 @@ public class TransactionEditController {
                 }
 
                 Transaction t = new Transaction();
-                t.setUserId(currentUserId);
+                t.setUserId(getCurrentUserId());
                 t.setAccountId(account.getId());
                 t.setCategoryId(category.getId());
                 t.setAmount(new BigDecimal(amountStr));
                 t.setNote(noteArea.getText());
                 t.setOccurredAt(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                transactionDao.save(t);
+                transactionService.save(t);
 
                 SceneSwitcher.switchScene(e, "/ui/transactions.fxml", "Transactions");
             } catch (Exception ex) {
@@ -68,5 +67,12 @@ public class TransactionEditController {
                 new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).show();
             }
         });
+    }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
     }
 }

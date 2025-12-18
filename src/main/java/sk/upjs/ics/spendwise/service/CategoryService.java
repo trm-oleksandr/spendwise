@@ -7,7 +7,15 @@ import java.util.List;
 
 public class CategoryService {
 
-    private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
+    private final CategoryDao categoryDao;
+
+    public CategoryService() {
+        this(JdbcDaoFactory.INSTANCE.categoryDao());
+    }
+
+    public CategoryService(CategoryDao categoryDao) {
+        this.categoryDao = categoryDao;
+    }
 
     public List<Category> getAll(Long userId) {
         return categoryDao.getAll(userId);
@@ -18,7 +26,7 @@ public class CategoryService {
         categoryDao.save(category);
     }
 
-    public void delete(Long id) {
-        categoryDao.delete(id);
+    public void delete(Long id, Long userId) {
+        categoryDao.delete(id, userId);
     }
 }

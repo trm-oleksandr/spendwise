@@ -1,0 +1,157 @@
+/* Light theme counterpart to style.css */
+.root {
+    -fx-base: #f3f4f6;
+    -fx-background: #ffffff;
+    -fx-accent: #2563eb;
+    -fx-focus-color: #2563eb;
+    -fx-faint-focus-color: #2563eb22;
+    -fx-text-base-color: #111827;
+    -fx-text-background-color: #111827;
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-size: 14px;
+}
+
+.header-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 2);
+    -fx-padding: 0 0 20 0;
+}
+
+.subheader-label {
+    -fx-text-fill: #4b5563;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10 0;
+}
+
+.label {
+    -fx-text-fill: #374151;
+}
+
+.text-field, .password-field, .text-area, .combo-box, .date-picker .text-field {
+    -fx-background-color: #f9fafb;
+    -fx-background-insets: 0;
+    -fx-background-radius: 6;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 6;
+    -fx-text-fill: #111827;
+    -fx-prompt-text-fill: #6b7280;
+    -fx-padding: 8;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-background-color: #ffffff;
+}
+
+.text-area .content {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #111827;
+}
+
+.button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #111827;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 6;
+}
+
+.button:hover {
+    -fx-background-color: #d1d5db;
+}
+
+.button:pressed {
+    -fx-background-color: #cbd5e1;
+}
+
+.button-primary {
+    -fx-background-color: #10b981;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+.button-primary:hover { -fx-background-color: #059669; }
+
+.button-danger {
+    -fx-background-color: #ef4444;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+.button-danger:hover { -fx-background-color: #dc2626; }
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 4;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f3f4f6;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #e5e7eb;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+    -fx-border-color: transparent #e5e7eb transparent transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2563eb;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+}
+
+.table-row-cell:odd { -fx-background-color: #f9fafb; }
+.table-row-cell:selected { -fx-background-color: #dbeafe; }
+.table-row-cell:selected .table-cell { -fx-text-fill: #111827; }
+.table-cell { -fx-text-fill: #111827; -fx-alignment: CENTER_LEFT; }
+.table-view .placeholder .label { -fx-text-fill: #6b7280; }
+
+.chart { -fx-text-fill: #111827; }
+.chart-title { -fx-text-fill: #111827; -fx-font-size: 1.2em; }
+.chart-pie-label { -fx-fill: #111827; -fx-font-size: 11px; }
+.chart-legend { -fx-background-color: transparent; }
+.chart-legend-item { -fx-text-fill: #111827; }
+
+.filter-bar {
+    -fx-background-color: #f9fafb;
+    -fx-background-radius: 8;
+    -fx-border-color: #e5e7eb;
+    -fx-border-radius: 8;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.lang-button {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #374151;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 15;
+    -fx-background-radius: 20;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+
+.lang-button:hover { -fx-background-color: #d1d5db; -fx-text-fill: #111827; }
+
+.lang-button-active {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-border-color: #1d4ed8;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.4), 10, 0, 0, 0);
+}

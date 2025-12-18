@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import sk.upjs.ics.spendwise.entity.Account;
@@ -14,7 +15,9 @@ import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.TransactionService;
+import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
+import sk.upjs.ics.spendwise.ui.util.ThemeManager;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,12 +31,14 @@ public class DashboardController {
     @FXML private PieChart expenseChart;
     @FXML private VBox emptyStateBox;
     @FXML private ComboBox<Account> accountSelector;
+    @FXML private Label totalLabel;
+
     @FXML private Button langEnBtn;
     @FXML private Button langSkBtn;
+    @FXML private Button themeToggleBtn;
 
     private final TransactionService transactionService = new TransactionService();
     private final AccountService accountService = new AccountService();
-    private final Long currentUserId = 1L;
     private ResourceBundle resources;
 
     @FXML
@@ -42,6 +47,7 @@ public class DashboardController {
 
         // 1. Обновляем вид кнопок (подсветка активной)
         updateLanguageButtons();
+        updateThemeToggle();
 
         setupAccountSelector();
 
@@ -80,6 +86,12 @@ public class DashboardController {
         changeLanguage(new Locale("sk"), event);
     }
 
+    @FXML
+    void toggleTheme(ActionEvent event) {
+        ThemeManager.toggleTheme();
+        SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
+    }
+
     private void changeLanguage(Locale locale, ActionEvent event) {
         // Если язык уже выбран, ничего не делаем (чтобы не моргало)
         if (SceneSwitcher.getCurrentLocale().getLanguage().equals(locale.getLanguage())) {
@@ -91,8 +103,18 @@ public class DashboardController {
     }
     // --------------------------------
 
+    private void updateThemeToggle() {
+        if (ThemeManager.getActiveTheme() == ThemeManager.Theme.DARK) {
+            themeToggleBtn.setText("🌙");
+            themeToggleBtn.setTooltip(new javafx.scene.control.Tooltip(resources.getString("theme.dark")));
+        } else {
+            themeToggleBtn.setText("☀️");
+            themeToggleBtn.setTooltip(new javafx.scene.control.Tooltip(resources.getString("theme.light")));
+        }
+    }
+
     private void setupAccountSelector() {
-        List<Account> userAccounts = accountService.getAll(currentUserId);
+        List<Account> userAccounts = accountService.getAll(getCurrentUserId());
         Account allAccountsOption = new Account();
         allAccountsOption.setId(-1L);
         allAccountsOption.setName(resources.getString("dashboard.all_accounts"));
@@ -114,13 +136,15 @@ public class DashboardController {
 
     private void loadChartData(Account selectedAccount) {
         try {
-            List<Transaction> transactions = transactionService.getAll(currentUserId);
+            List<Transaction> transactions = transactionService.getAll(getCurrentUserId());
 
             if (selectedAccount.getId() != -1L) {
                 transactions = transactions.stream()
                         .filter(t -> t.getAccountId().equals(selectedAccount.getId()))
                         .collect(Collectors.toList());
             }
+
+            updateTotalLabel(selectedAccount, transactions);
 
             List<Transaction> expensesOnly = transactions.stream()
                     .filter(t -> t.getType() == CategoryType.EXPENSE)
@@ -154,8 +178,45 @@ public class DashboardController {
         }
     }
 
+    private void updateTotalLabel(Account selectedAccount, List<Transaction> transactions) {
+        boolean showTotal = selectedAccount.getId() != -1L;
+        totalLabel.setVisible(showTotal);
+        totalLabel.setManaged(showTotal);
+
+        if (!showTotal) {
+            return;
+        }
+
+        BigDecimal total = transactions.stream()
+                .map(t -> t.getType() == CategoryType.EXPENSE
+                        ? t.getAmount().negate()
+                        : t.getAmount())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        totalLabel.setText(resources.getString("dashboard.total_prefix") + " " + total + " €");
+
+        String color;
+        int sign = total.compareTo(BigDecimal.ZERO);
+        if (sign > 0) {
+            color = "#2e7d32";
+        } else if (sign < 0) {
+            color = "#c62828";
+        } else {
+            color = "#aaaaaa";
+        }
+        totalLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 18px;");
+    }
+
     @FXML void showAccounts(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts"); }
-    @FXML void logout(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login"); }
+    @FXML void logout(ActionEvent event) { AuthContext.clear(); SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login"); }
     @FXML void showCategories(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/categories.fxml", "Manage Categories"); }
-    @FXML void showTransactions(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions"); }
+    @FXML void showTransactions(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions");}
+    @FXML void showBudgets(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/budgets.fxml", "Budgets"); }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
+    }
 }

@@ -5,13 +5,14 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import sk.upjs.ics.spendwise.dao.AccountDao;
-import sk.upjs.ics.spendwise.dao.CategoryDao;
-import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.Transaction;
-import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
+import sk.upjs.ics.spendwise.security.AuthContext;
+import sk.upjs.ics.spendwise.service.AccountService;
+import sk.upjs.ics.spendwise.service.CategoryService;
+import sk.upjs.ics.spendwise.service.TransactionService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -33,18 +34,14 @@ public class TransactionsController {
     @FXML private ComboBox<Account> accountFilter;
     @FXML private ComboBox<Category> categoryFilter;
     @FXML private Button resetBtn;
-    @FXML private Label totalLabel;
 
     @FXML private Button addBtn;
     @FXML private Button deleteBtn;
     @FXML private Button backBtn;
 
-    private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
-    private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
-    private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
-
-    // Заглушка, пока не подключим AuthContext
-    private final Long currentUserId = 1L;
+    private final TransactionService transactionService = DefaultServiceFactory.INSTANCE.transactionService();
+    private final AccountService accountService = DefaultServiceFactory.INSTANCE.accountService();
+    private final CategoryService categoryService = DefaultServiceFactory.INSTANCE.categoryService();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
@@ -80,7 +77,7 @@ public class TransactionsController {
         deleteBtn.setOnAction(e -> {
             Transaction selected = transactionsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                transactionDao.delete(selected.getId());
+                transactionService.delete(selected.getId(), getCurrentUserId());
                 refreshTable();
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select transaction first!").show();
@@ -89,13 +86,13 @@ public class TransactionsController {
     }
 
     private void loadFilters() {
-        accountFilter.setItems(FXCollections.observableArrayList(accountDao.getAll(currentUserId)));
-        categoryFilter.setItems(FXCollections.observableArrayList(categoryDao.getAll(currentUserId)));
+        accountFilter.setItems(FXCollections.observableArrayList(accountService.getAll(getCurrentUserId())));
+        categoryFilter.setItems(FXCollections.observableArrayList(categoryService.getAll(getCurrentUserId())));
     }
 
     private void refreshTable() {
         try {
-            List<Transaction> all = transactionDao.getAll(currentUserId);
+            List<Transaction> all = transactionService.getAll(getCurrentUserId());
 
             Account selAccount = accountFilter.getValue();
             Category selCategory = categoryFilter.getValue();
@@ -106,13 +103,15 @@ public class TransactionsController {
                     .collect(Collectors.toList());
 
             transactionsTable.setItems(FXCollections.observableArrayList(filtered));
-
-            BigDecimal total = filtered.stream()
-                    .map(Transaction::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            totalLabel.setText("Total: " + total + " €");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
     }
 }

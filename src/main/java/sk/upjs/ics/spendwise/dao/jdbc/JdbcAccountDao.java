@@ -38,10 +38,10 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public Optional<Account> getById(Long id) {
-        String sql = "SELECT * FROM account WHERE id = ?";
+    public Optional<Account> getById(Long id, Long userId) {
+        String sql = "SELECT * FROM account WHERE id = ? AND user_id = ?";
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, accountMapper, id));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, accountMapper, id, userId));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -62,18 +62,18 @@ public class JdbcAccountDao implements AccountDao {
             }, keyHolder);
             account.setId(((Number) keyHolder.getKeys().get("id")).longValue());
             // Обновляем created_at из БД (опционально, но полезно)
-            return getById(account.getId()).orElse(account);
+            return getById(account.getId(), account.getUserId()).orElse(account);
         } else {
             // UPDATE
-            String sql = "UPDATE account SET name = ?, currency = ? WHERE id = ?";
-            jdbcTemplate.update(sql, account.getName(), account.getCurrency(), account.getId());
+            String sql = "UPDATE account SET name = ?, currency = ? WHERE id = ? AND user_id = ?";
+            jdbcTemplate.update(sql, account.getName(), account.getCurrency(), account.getId(), account.getUserId());
             return account;
         }
     }
 
     @Override
-    public boolean delete(Long id) {
-        String sql = "DELETE FROM account WHERE id = ?";
-        return jdbcTemplate.update(sql, id) > 0;
+    public boolean delete(Long id, Long userId) {
+        String sql = "DELETE FROM account WHERE id = ? AND user_id = ?";
+        return jdbcTemplate.update(sql, id, userId) > 0;
     }
 }
