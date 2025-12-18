@@ -27,7 +27,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public List<Transaction> getAll(Long userId) {
-        // Достаем тип категории (INCOME/EXPENSE) через JOIN
+        // (INCOME/EXPENSE) через JOIN
         String sql = """
             SELECT 
                 t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,

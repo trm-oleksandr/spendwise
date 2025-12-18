@@ -23,11 +23,10 @@ public enum JdbcDaoFactory implements DaoFactory {
     private JdbcTransactionDao transactionDao;
 
     JdbcDaoFactory() {
-        // ИСПРАВЛЕНО: Берем JdbcTemplate из уже существующего AppConfig
         this.jdbcTemplate = AppConfig.getInstance().getJdbcTemplate();
     }
 
-    // ИСПРАВЛЕНО: Добавлен метод, который ожидает LoginController
+    // LoginController
     public static JdbcDaoFactory getInstance() {
         return INSTANCE;
     }

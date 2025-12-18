@@ -7,6 +7,6 @@ import java.util.Optional;
 public interface AccountDao {
     List<Account> getAll(Long userId);
     Optional<Account> getById(Long id);
-    Account save(Account account); // Создает или обновляет
+    Account save(Account account);
     boolean delete(Long id);
 }

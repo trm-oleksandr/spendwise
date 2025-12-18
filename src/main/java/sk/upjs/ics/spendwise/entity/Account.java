@@ -9,7 +9,7 @@ public class Account {
     private String currency;
     private Instant createdAt;
 
-    // Пустой (nees for RowMapper)
+    //(need for RowMapper)
     public Account() {
     }
 
@@ -20,8 +20,7 @@ public class Account {
         this.currency = currency;
         this.createdAt = createdAt;
     }
-
-    // Getters Setters
+    
     public Long getId() {
         return id;
     }

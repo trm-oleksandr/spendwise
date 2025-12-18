@@ -4,7 +4,7 @@ public class Category {
     private Long id;
     private Long userId;
     private String name;
-    private CategoryType type; // INCOME или EXPENSE
+    private CategoryType type; // INCOME/EXPENSE
 
     public Category() {
     }
@@ -50,6 +50,6 @@ public class Category {
 
     @Override
     public String toString() {
-        return name; // Важно для ComboBox в JavaFX
+        return name;
     }
 }
