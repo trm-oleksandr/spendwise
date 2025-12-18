@@ -28,8 +28,6 @@ public class DashboardController {
     @FXML private PieChart expenseChart;
     @FXML private VBox emptyStateBox;
     @FXML private ComboBox<Account> accountSelector;
-
-    // Новые кнопки для управления стилем
     @FXML private Button langEnBtn;
     @FXML private Button langSkBtn;
 

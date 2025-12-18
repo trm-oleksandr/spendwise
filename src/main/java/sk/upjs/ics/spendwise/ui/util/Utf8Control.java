@@ -37,7 +37,7 @@ public class Utf8Control extends ResourceBundle.Control {
 
         if (stream != null) {
             try {
-                // ВОТ ГЛАВНАЯ МАГИЯ: Читаем как UTF-8
+                // read(как UTF-8)
                 bundle = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
             } finally {
                 stream.close();

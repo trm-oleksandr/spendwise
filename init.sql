@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS account;
 DROP TABLE IF EXISTS app_user;
 
--- Пользователи
 CREATE TABLE app_user (
                           id BIGSERIAL PRIMARY KEY,
                           username VARCHAR(50) UNIQUE NOT NULL,
@@ -11,7 +10,6 @@ CREATE TABLE app_user (
                           created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Счета (добавлен ON DELETE CASCADE)
 CREATE TABLE account (
                          id BIGSERIAL PRIMARY KEY,
                          user_id BIGINT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
@@ -21,7 +19,6 @@ CREATE TABLE account (
                          UNIQUE(user_id, name)
 );
 
--- Категории (добавлен ON DELETE CASCADE)
 CREATE TABLE category (
                           id BIGSERIAL PRIMARY KEY,
                           user_id BIGINT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
@@ -30,7 +27,6 @@ CREATE TABLE category (
                           UNIQUE(user_id, name, type)
 );
 
--- Транзакции (добавлен ON DELETE CASCADE для всех связей)
 CREATE TABLE txn (
                      id BIGSERIAL PRIMARY KEY,
                      user_id BIGINT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
@@ -42,5 +38,4 @@ CREATE TABLE txn (
                      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Индексы
 CREATE INDEX idx_txn_user_date ON txn(user_id, occurred_at);
