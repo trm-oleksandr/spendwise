@@ -52,6 +52,6 @@ class CategoryDaoTest {
         assertTrue(found, "Category should be found in database");
 
         // 3. Удаляем за собой (чтобы не мусорить)
-        dao.delete(saved.getId());
+        dao.delete(saved.getId(), 1L);
     }
 }

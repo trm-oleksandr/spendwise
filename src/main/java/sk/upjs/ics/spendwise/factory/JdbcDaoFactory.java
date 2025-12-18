@@ -3,10 +3,12 @@ package sk.upjs.ics.spendwise.factory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sk.upjs.ics.spendwise.config.AppConfig;
 import sk.upjs.ics.spendwise.dao.AccountDao;
+import sk.upjs.ics.spendwise.dao.BudgetDao;
 import sk.upjs.ics.spendwise.dao.CategoryDao;
 import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.dao.UserDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcAccountDao;
+import sk.upjs.ics.spendwise.dao.jdbc.JdbcBudgetDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcCategoryDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcTransactionDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcUserDao;
@@ -21,6 +23,7 @@ public enum JdbcDaoFactory implements DaoFactory {
     private JdbcAccountDao accountDao;
     private JdbcCategoryDao categoryDao;
     private JdbcTransactionDao transactionDao;
+    private JdbcBudgetDao budgetDao;
 
     JdbcDaoFactory() {
         // ИСПРАВЛЕНО: Берем JdbcTemplate из уже существующего AppConfig
@@ -62,5 +65,13 @@ public enum JdbcDaoFactory implements DaoFactory {
             transactionDao = new JdbcTransactionDao(jdbcTemplate);
         }
         return transactionDao;
+    }
+
+    @Override
+    public BudgetDao budgetDao() {
+        if (budgetDao == null) {
+            budgetDao = new JdbcBudgetDao(jdbcTemplate);
+        }
+        return budgetDao;
     }
 }

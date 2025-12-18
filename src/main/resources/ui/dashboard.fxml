@@ -52,6 +52,7 @@
                     <Button fx:id="accountsBtn" mnemonicParsing="false" onAction="#showAccounts" prefHeight="50.0" prefWidth="160.0" text="%dashboard.btn.accounts" />
                     <Button fx:id="categoriesBtn" mnemonicParsing="false" onAction="#showCategories" prefHeight="50.0" prefWidth="160.0" text="%dashboard.btn.categories" />
                     <Button fx:id="transactionsBtn" mnemonicParsing="false" onAction="#showTransactions" prefHeight="50.0" prefWidth="160.0" styleClass="button-primary" text="%dashboard.btn.transactions" />
+                    <Button fx:id="budgetsBtn" mnemonicParsing="false" onAction="#showBudgets" prefHeight="50.0" prefWidth="160.0" text="%dashboard.btn.budgets" />
                 </HBox>
 
                 <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#logout" styleClass="button-danger" text="%dashboard.btn.logout">

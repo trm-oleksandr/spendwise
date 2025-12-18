@@ -44,6 +44,6 @@ class AccountDaoTest {
         assertTrue(found, "Account should be found in database");
 
         // 3. Удаляем (чистим мусор)
-        dao.delete(saved.getId());
+        dao.delete(saved.getId(), 1L);
     }
 }

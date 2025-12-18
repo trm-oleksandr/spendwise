@@ -17,7 +17,7 @@ public class AccountService {
         accountDao.save(account);
     }
 
-    public void delete(Long id) {
-        accountDao.delete(id);
+    public void delete(Long id, Long userId) {
+        accountDao.delete(id, userId);
     }
 }

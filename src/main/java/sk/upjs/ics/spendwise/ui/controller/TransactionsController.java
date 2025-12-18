@@ -12,6 +12,7 @@ import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -42,9 +43,6 @@ public class TransactionsController {
     private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
     private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
     private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
-
-    // Заглушка, пока не подключим AuthContext
-    private final Long currentUserId = 1L;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
@@ -80,7 +78,7 @@ public class TransactionsController {
         deleteBtn.setOnAction(e -> {
             Transaction selected = transactionsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                transactionDao.delete(selected.getId());
+                transactionDao.delete(selected.getId(), getCurrentUserId());
                 refreshTable();
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select transaction first!").show();
@@ -89,13 +87,13 @@ public class TransactionsController {
     }
 
     private void loadFilters() {
-        accountFilter.setItems(FXCollections.observableArrayList(accountDao.getAll(currentUserId)));
-        categoryFilter.setItems(FXCollections.observableArrayList(categoryDao.getAll(currentUserId)));
+        accountFilter.setItems(FXCollections.observableArrayList(accountDao.getAll(getCurrentUserId())));
+        categoryFilter.setItems(FXCollections.observableArrayList(categoryDao.getAll(getCurrentUserId())));
     }
 
     private void refreshTable() {
         try {
-            List<Transaction> all = transactionDao.getAll(currentUserId);
+            List<Transaction> all = transactionDao.getAll(getCurrentUserId());
 
             Account selAccount = accountFilter.getValue();
             Category selCategory = categoryFilter.getValue();
@@ -114,5 +112,12 @@ public class TransactionsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
     }
 }

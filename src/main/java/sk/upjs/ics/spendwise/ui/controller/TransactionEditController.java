@@ -10,6 +10,7 @@ import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -30,12 +31,10 @@ public class TransactionEditController {
     private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
     private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
 
-    private final Long currentUserId = 1L;
-
     @FXML
     public void initialize() {
-        accountComboBox.setItems(FXCollections.observableArrayList(accountDao.getAll(currentUserId)));
-        categoryComboBox.setItems(FXCollections.observableArrayList(categoryDao.getAll(currentUserId)));
+        accountComboBox.setItems(FXCollections.observableArrayList(accountDao.getAll(getCurrentUserId())));
+        categoryComboBox.setItems(FXCollections.observableArrayList(categoryDao.getAll(getCurrentUserId())));
         datePicker.setValue(LocalDate.now());
 
         cancelBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/transactions.fxml", "Transactions"));
@@ -53,7 +52,7 @@ public class TransactionEditController {
                 }
 
                 Transaction t = new Transaction();
-                t.setUserId(currentUserId);
+                t.setUserId(getCurrentUserId());
                 t.setAccountId(account.getId());
                 t.setCategoryId(category.getId());
                 t.setAmount(new BigDecimal(amountStr));
@@ -68,5 +67,12 @@ public class TransactionEditController {
                 new Alert(Alert.AlertType.ERROR, "Error: " + ex.getMessage()).show();
             }
         });
+    }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
     }
 }

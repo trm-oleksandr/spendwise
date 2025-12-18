@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.CategoryType;
+import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.service.CategoryService; // <-- Новый импорт
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
@@ -28,8 +29,6 @@ public class CategoriesController {
 
     // ИСПОЛЬЗУЕМ SERVICE ВМЕСТО DAO
     private final CategoryService categoryService = new CategoryService();
-
-    private final Long currentUserId = 1L;
 
     @FXML
     public void initialize() {
@@ -61,7 +60,7 @@ public class CategoriesController {
             }
 
             Category c = new Category();
-            c.setUserId(currentUserId);
+            c.setUserId(getCurrentUserId());
             c.setName(name);
             c.setType(type);
 
@@ -80,7 +79,7 @@ public class CategoriesController {
         Category selected = categoriesTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             // Вызов через сервис
-            categoryService.delete(selected.getId());
+            categoryService.delete(selected.getId(), getCurrentUserId());
             refreshTable();
         } else {
             new Alert(Alert.AlertType.WARNING, "Select a category to delete!").show();
@@ -89,7 +88,14 @@ public class CategoriesController {
 
     private void refreshTable() {
         // Вызов через сервис
-        List<Category> list = categoryService.getAll(currentUserId);
+        List<Category> list = categoryService.getAll(getCurrentUserId());
         categoriesTable.setItems(FXCollections.observableArrayList(list));
+    }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
     }
 }
