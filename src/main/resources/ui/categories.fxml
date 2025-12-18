@@ -15,21 +15,21 @@
     <children>
         <VBox spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
             <children>
-                <Label styleClass="header-label" text="Manage Categories" />
+                <Label styleClass="header-label" text="%categories.title" />
 
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
                     <children>
-                        <TextField fx:id="nameField" promptText="Category Name (e.g. Food)" HBox.hgrow="ALWAYS" />
-                        <ComboBox fx:id="typeComboBox" prefWidth="150.0" promptText="Type" />
-                        <Button fx:id="addButton" styleClass="button-primary" text="Add Category" />
+                        <TextField fx:id="nameField" promptText="%categories.placeholder.name" HBox.hgrow="ALWAYS" />
+                        <ComboBox fx:id="typeComboBox" prefWidth="150.0" promptText="%categories.placeholder.type" />
+                        <Button fx:id="addButton" styleClass="button-primary" text="%btn.add" />
                     </children>
                 </HBox>
 
                 <TableView fx:id="categoriesTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="idCol" prefWidth="50.0" text="ID" />
-                        <TableColumn fx:id="nameCol" prefWidth="250.0" text="Category Name" />
-                        <TableColumn fx:id="typeCol" prefWidth="150.0" text="Type" />
+                        <TableColumn fx:id="idCol" prefWidth="50.0" text="%categories.col.id" />
+                        <TableColumn fx:id="nameCol" prefWidth="250.0" text="%categories.col.name" />
+                        <TableColumn fx:id="typeCol" prefWidth="150.0" text="%categories.col.type" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -38,8 +38,8 @@
 
                 <HBox spacing="10.0">
                     <children>
-                        <Button fx:id="deleteButton" styleClass="button-danger" text="Delete Selected" />
-                        <Button fx:id="backButton" text="Back to Dashboard" />
+                        <Button fx:id="deleteButton" styleClass="button-danger" text="%btn.delete" />
+                        <Button fx:id="backButton" text="%btn.back" />
                     </children>
                 </HBox>
             </children>
