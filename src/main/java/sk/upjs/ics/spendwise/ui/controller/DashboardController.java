@@ -5,9 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
-import sk.upjs.ics.spendwise.dao.TransactionDao;
+import javafx.scene.control.ComboBox;
+import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
+import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Transaction;
-import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.service.AccountService;
+import sk.upjs.ics.spendwise.service.TransactionService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -17,23 +21,95 @@ import java.util.stream.Collectors;
 
 public class DashboardController {
 
-    @FXML private PieChart expenseChart; // Наш график
+    @FXML private PieChart expenseChart;
+    @FXML private VBox emptyStateBox;
+    @FXML private ComboBox<Account> accountSelector;
 
-    private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
+    private final TransactionService transactionService = new TransactionService();
+    private final AccountService accountService = new AccountService();
+
     private final Long currentUserId = 1L;
 
     @FXML
     public void initialize() {
-        loadChartData();
+        setupAccountSelector();
+
+        // Слушатель выбора
+        accountSelector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                loadChartData(newVal);
+            }
+        });
+
+        // Выбираем первый пункт сразу
+        accountSelector.getSelectionModel().selectFirst();
     }
 
-    private void loadChartData() {
-        try {
-            List<Transaction> transactions = transactionDao.getAll(currentUserId);
+    private void setupAccountSelector() {
+        List<Account> userAccounts = accountService.getAll(currentUserId);
 
-            // Группируем транзакции по названию категории и суммируем
-            Map<String, BigDecimal> expensesByCategory = transactions.stream()
-                    .filter(t -> t.getCategoryName() != null) // только если есть категория
+        Account allAccountsOption = new Account();
+        allAccountsOption.setId(-1L);
+        allAccountsOption.setName("All Accounts");
+
+        ObservableList<Account> options = FXCollections.observableArrayList();
+        options.add(allAccountsOption);
+        options.addAll(userAccounts);
+
+        accountSelector.setItems(options);
+
+        // Красивое отображение имен в списке
+        accountSelector.setConverter(new StringConverter<Account>() {
+            @Override
+            public String toString(Account account) {
+                return account == null ? "" : account.getName();
+            }
+
+            @Override
+            public Account fromString(String string) {
+                return null;
+            }
+        });
+    }
+
+    private void loadChartData(Account selectedAccount) {
+        try {
+            System.out.println("--- Loading Chart Data for: " + selectedAccount.getName() + " (ID: " + selectedAccount.getId() + ") ---");
+
+            // 1. Берем ВСЕ транзакции
+            List<Transaction> transactions = transactionService.getAll(currentUserId);
+            System.out.println("Total transactions found: " + transactions.size());
+
+            // 2. Фильтруем по счету
+            if (selectedAccount.getId() != -1L) {
+                transactions = transactions.stream()
+                        .filter(t -> t.getAccountId().equals(selectedAccount.getId()))
+                        .collect(Collectors.toList());
+            }
+            System.out.println("Transactions for this account: " + transactions.size());
+
+            // 3. Оставляем ТОЛЬКО РАСХОДЫ (EXPENSE)
+            List<Transaction> expensesOnly = transactions.stream()
+                    .filter(t -> "EXPENSE".equals(t.getType()))
+                    .toList();
+
+            System.out.println("Expenses only: " + expensesOnly.size());
+
+            // 4. Отображаем
+            if (expensesOnly.isEmpty()) {
+                System.out.println("Result: EMPTY (Showing placeholder)");
+                expenseChart.setVisible(false);
+                emptyStateBox.setVisible(true);
+                return;
+            }
+
+            System.out.println("Result: SHOW GRAPH");
+            expenseChart.setVisible(true);
+            emptyStateBox.setVisible(false);
+
+            // 5. Группируем
+            Map<String, BigDecimal> expensesByCategory = expensesOnly.stream()
+                    .filter(t -> t.getCategoryName() != null)
                     .collect(Collectors.toMap(
                             Transaction::getCategoryName,
                             Transaction::getAmount,
@@ -41,17 +117,14 @@ public class DashboardController {
                     ));
 
             ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-
             for (Map.Entry<String, BigDecimal> entry : expensesByCategory.entrySet()) {
                 pieData.add(new PieChart.Data(entry.getKey(), entry.getValue().doubleValue()));
             }
 
             expenseChart.setData(pieData);
-            expenseChart.setLabelsVisible(true);
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Could not load chart data");
         }
     }
 

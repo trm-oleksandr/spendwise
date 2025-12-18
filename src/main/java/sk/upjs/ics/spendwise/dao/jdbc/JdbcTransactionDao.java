@@ -10,63 +10,52 @@ import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 public class JdbcTransactionDao implements TransactionDao {
+
     private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<Transaction> transactionMapper;
 
     public JdbcTransactionDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        // Маппер собирает данные из JOIN-ов (имя категории, имя счета)
-        this.transactionMapper = (rs, rowNum) -> {
-            Transaction t = new Transaction();
-            t.setId(rs.getLong("id"));
-            t.setUserId(rs.getLong("user_id"));
-            t.setAccountId(rs.getLong("account_id"));
-            t.setCategoryId(rs.getLong("category_id"));
-            t.setAmount(rs.getBigDecimal("amount"));
-            t.setOccurredAt(rs.getTimestamp("occurred_at").toInstant());
-            t.setNote(rs.getString("note"));
-            t.setCreatedAt(rs.getTimestamp("created_at").toInstant());
-
-            // Дополнительные поля из JOIN (для красивого отображения в таблице)
-            // Проверяем, есть ли эти колонки в ResultSet (чтобы не падать на простых запросах)
-            try {
-                t.setCategoryName(rs.getString("category_name"));
-                t.setType(CategoryType.valueOf(rs.getString("category_type")));
-                t.setAccountName(rs.getString("account_name"));
-            } catch (Exception e) {
-                // Игнорируем, если колонок нет
-            }
-            return t;
-        };
     }
 
     @Override
     public List<Transaction> getAll(Long userId) {
-        // Делаем JOIN, чтобы сразу получить имена категорий и счетов
         String sql = """
-            SELECT t.*, c.name as category_name, c.type as category_type, a.name as account_name
+            SELECT 
+                t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,
+                c.name AS category_name, c.type AS category_type,
+                a.name AS account_name
             FROM txn t
             JOIN category c ON t.category_id = c.id
             JOIN account a ON t.account_id = a.id
             WHERE t.user_id = ?
             ORDER BY t.occurred_at DESC
         """;
-        return jdbcTemplate.query(sql, transactionMapper, userId);
+        return jdbcTemplate.query(sql, new TransactionMapper(), userId);
     }
 
     @Override
-    public Optional<Transaction> getById(Long id) {
-        String sql = "SELECT * FROM txn WHERE id = ?";
+    public Transaction getById(Long id) {
+        String sql = """
+            SELECT 
+                t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,
+                c.name AS category_name, c.type AS category_type,
+                a.name AS account_name
+            FROM txn t
+            JOIN category c ON t.category_id = c.id
+            JOIN account a ON t.account_id = a.id
+            WHERE t.id = ?
+        """;
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, transactionMapper, id));
+            return jdbcTemplate.queryForObject(sql, new TransactionMapper(), id);
         } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
+            return null;
         }
     }
 
@@ -86,19 +75,41 @@ public class JdbcTransactionDao implements TransactionDao {
                 return ps;
             }, keyHolder);
             t.setId(((Number) keyHolder.getKeys().get("id")).longValue());
-            return getById(t.getId()).orElse(t);
         } else {
-            String sql = "UPDATE txn SET account_id=?, category_id=?, amount=?, occurred_at=?, note=? WHERE id=?";
-            jdbcTemplate.update(sql,
-                    t.getAccountId(), t.getCategoryId(), t.getAmount(),
-                    Timestamp.from(t.getOccurredAt()), t.getNote(), t.getId());
-            return t;
+            // Тут можно добавить UPDATE логику, если нужно
         }
+        return t;
     }
 
     @Override
     public boolean delete(Long id) {
         String sql = "DELETE FROM txn WHERE id = ?";
-        return jdbcTemplate.update(sql, id) > 0;
+        int changed = jdbcTemplate.update(sql, id);
+        return changed > 0;
+    }
+
+    private static class TransactionMapper implements RowMapper<Transaction> {
+        @Override
+        public Transaction mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Transaction t = new Transaction();
+            t.setId(rs.getLong("id"));
+            t.setAmount(rs.getBigDecimal("amount"));
+            t.setOccurredAt(rs.getTimestamp("occurred_at").toInstant());
+            t.setNote(rs.getString("note"));
+
+            t.setAccountId(rs.getLong("account_id"));
+            t.setCategoryId(rs.getLong("category_id"));
+
+            t.setAccountName(rs.getString("account_name"));
+            t.setCategoryName(rs.getString("category_name"));
+
+            // ИСПРАВЛЕНИЕ: Конвертируем строку в Enum
+            String typeStr = rs.getString("category_type");
+            if (typeStr != null) {
+                t.setType(CategoryType.valueOf(typeStr));
+            }
+
+            return t;
+        }
     }
 }
