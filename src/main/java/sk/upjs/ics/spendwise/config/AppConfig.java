@@ -9,6 +9,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ClassPathResource;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 public class AppConfig {
 
@@ -30,6 +33,8 @@ public class AppConfig {
         this.dataSource = new HikariDataSource(hikariConfig);
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
         logger.info("HikariDataSource and JdbcTemplate initialized successfully");
+
+        initializeDatabase();
     }
 
     public static AppConfig getInstance() {
@@ -52,6 +57,12 @@ public class AppConfig {
             logger.info("Closing HikariDataSource");
             dataSource.close();
         }
+    }
+
+    private void initializeDatabase() {
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("init.sql"));
+        DatabasePopulatorUtils.execute(populator, dataSource);
+        logger.info("Database schema ensured using init.sql");
     }
 
     private Properties loadProperties() {
