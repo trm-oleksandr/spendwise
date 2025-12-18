@@ -7,8 +7,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.CategoryType;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
-import sk.upjs.ics.spendwise.service.CategoryService; // <-- Новый импорт
+import sk.upjs.ics.spendwise.service.CategoryService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.util.List;
@@ -27,8 +28,7 @@ public class CategoriesController {
     @FXML private Button deleteButton;
     @FXML private Button backButton;
 
-    // ИСПОЛЬЗУЕМ SERVICE ВМЕСТО DAO
-    private final CategoryService categoryService = new CategoryService();
+    private final CategoryService categoryService = DefaultServiceFactory.INSTANCE.categoryService();
 
     @FXML
     public void initialize() {

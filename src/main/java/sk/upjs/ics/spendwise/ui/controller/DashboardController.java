@@ -16,6 +16,7 @@ import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.TransactionService;
 import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
+import sk.upjs.ics.spendwise.ui.util.ThemeManager;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,9 +31,9 @@ public class DashboardController {
     @FXML private VBox emptyStateBox;
     @FXML private ComboBox<Account> accountSelector;
 
-    // Новые кнопки для управления стилем
     @FXML private Button langEnBtn;
     @FXML private Button langSkBtn;
+    @FXML private Button themeToggleBtn;
 
     private final TransactionService transactionService = new TransactionService();
     private final AccountService accountService = new AccountService();
@@ -44,6 +45,7 @@ public class DashboardController {
 
         // 1. Обновляем вид кнопок (подсветка активной)
         updateLanguageButtons();
+        updateThemeToggle();
 
         setupAccountSelector();
 
@@ -82,6 +84,12 @@ public class DashboardController {
         changeLanguage(new Locale("sk"), event);
     }
 
+    @FXML
+    void toggleTheme(ActionEvent event) {
+        ThemeManager.toggleTheme();
+        SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
+    }
+
     private void changeLanguage(Locale locale, ActionEvent event) {
         // Если язык уже выбран, ничего не делаем (чтобы не моргало)
         if (SceneSwitcher.getCurrentLocale().getLanguage().equals(locale.getLanguage())) {
@@ -92,6 +100,16 @@ public class DashboardController {
         SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
     }
     // --------------------------------
+
+    private void updateThemeToggle() {
+        if (ThemeManager.getActiveTheme() == ThemeManager.Theme.DARK) {
+            themeToggleBtn.setText("🌙");
+            themeToggleBtn.setTooltip(new javafx.scene.control.Tooltip(resources.getString("theme.dark")));
+        } else {
+            themeToggleBtn.setText("☀️");
+            themeToggleBtn.setTooltip(new javafx.scene.control.Tooltip(resources.getString("theme.light")));
+        }
+    }
 
     private void setupAccountSelector() {
         List<Account> userAccounts = accountService.getAll(getCurrentUserId());

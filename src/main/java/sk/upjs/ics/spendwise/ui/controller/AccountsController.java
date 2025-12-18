@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.entity.Account;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
@@ -27,7 +28,7 @@ public class AccountsController {
     @FXML private Button deleteButton;
     @FXML private Button backButton;
 
-    private final AccountService accountService = new AccountService();
+    private final AccountService accountService = DefaultServiceFactory.INSTANCE.accountService();
 
     @FXML
     public void initialize() {

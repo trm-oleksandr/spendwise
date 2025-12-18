@@ -9,7 +9,15 @@ import java.util.List;
 
 public class TransactionService {
 
-    private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
+    private final TransactionDao transactionDao;
+
+    public TransactionService() {
+        this(JdbcDaoFactory.INSTANCE.transactionDao());
+    }
+
+    public TransactionService(TransactionDao transactionDao) {
+        this.transactionDao = transactionDao;
+    }
 
     public List<Transaction> getAll(Long userId) {
         return transactionDao.getAll(userId);

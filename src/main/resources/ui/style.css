@@ -35,6 +35,12 @@
     -fx-padding: 0 0 20 0;
 }
 
+.subheader-label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10 0;
+}
+
 .label {
     -fx-text-fill: #e5e7eb; /* Светло-серый, читаемый */
 }
