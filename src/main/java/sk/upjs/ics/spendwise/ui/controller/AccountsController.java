@@ -8,6 +8,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.dao.AccountDao;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.time.Instant;
@@ -27,7 +28,7 @@ public class AccountsController {
     @FXML private Button deleteButton;
     @FXML private Button backButton;
 
-    private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
+    private final AccountService accountService = new AccountService();
     private final Long currentUserId = 1L;
 
     @FXML
@@ -66,7 +67,7 @@ public class AccountsController {
             a.setCurrency(currency);
             a.setCreatedAt(Instant.now());
 
-            accountDao.save(a);
+            accountService.save(a);
 
             nameField.clear();
             refreshTable();
@@ -80,7 +81,7 @@ public class AccountsController {
     private void onDelete(ActionEvent event) {
         Account selected = accountsTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            accountDao.delete(selected.getId());
+            accountService.delete(selected.getId());
             refreshTable();
         } else {
             new Alert(Alert.AlertType.WARNING, "Select account first!").show();
@@ -88,7 +89,7 @@ public class AccountsController {
     }
 
     private void refreshTable() {
-        List<Account> accounts = accountDao.getAll(currentUserId);
+        List<Account> accounts = accountService.getAll(currentUserId);
         accountsTable.setItems(FXCollections.observableArrayList(accounts));
     }
 }
