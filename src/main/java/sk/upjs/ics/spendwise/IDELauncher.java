@@ -1,9 +1,7 @@
-package sk.upjs.ics.spendwise;
-
-import sk.upjs.ics.spendwise.App;
+package sk.upjs.ics.spendwise.ui; // <--- Исправлено: папка ui
 
 public class IDELauncher {
     public static void main(String[] args) {
-        App.launch(App.class, args);
+        App.main(args);
     }
 }

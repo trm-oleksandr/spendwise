@@ -2,30 +2,32 @@ package sk.upjs.ics.spendwise.ui.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import sk.upjs.ics.spendwise.entity.AppUser;
-import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 public class DashboardController {
 
     @FXML
-    private Label helloLabel;
-
-    @FXML
-    public void initialize() {
-        AppUser currentUser = AuthContext.getCurrentUser();
-        if (currentUser == null) {
-            SceneSwitcher.switchTo("ui/login.fxml");
-            return;
-        }
-
-        helloLabel.setText("Hello, " + currentUser.getUsername());
+    void showAccounts(ActionEvent event) {
+        // Указываем путь к файлу accounts.fxml
+        // ВАЖНО: Путь должен быть правильным относительно папки resources
+        // Обычно это: /sk/upjs/ics/spendwise/ui/scene/accounts.fxml
+        SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts");
     }
 
     @FXML
-    private void onLogout(ActionEvent event) {
-        AuthContext.clear();
-        SceneSwitcher.switchTo("ui/login.fxml");
+    void logout(ActionEvent event) {
+        // Возвращаемся на логин
+        SceneSwitcher.switchScene(event, "/sk/upjs/ics/spendwise/ui/scene/login.fxml", "Login");
+    }
+
+    @FXML
+    void showCategories(ActionEvent event) {
+        // Указываем путь к нашему новому файлу
+        SceneSwitcher.switchScene(event, "/ui/categories.fxml", "Manage Categories");
+    }
+
+    @FXML
+    void showTransactions(ActionEvent event) {
+        SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions");
     }
 }
