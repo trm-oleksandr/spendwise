@@ -2,40 +2,47 @@ package sk.upjs.ics.spendwise.ui.util;
 
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class SceneSwitcher {
 
     private static Stage primaryStage;
-
-    // ЖЕСТКИЙ РАЗМЕР (Стандарт для всего приложения)
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
 
+    // По умолчанию Английский
+    private static Locale currentLocale = new Locale("en");
+
     public static void setStage(Stage stage) {
         primaryStage = stage;
-        // Устанавливаем размер сразу при старте
-        primaryStage.setWidth(WIDTH);
-        primaryStage.setHeight(HEIGHT);
-        // Запрещаем делать окно слишком маленьким
         primaryStage.setMinWidth(WIDTH);
         primaryStage.setMinHeight(HEIGHT);
+        primaryStage.setWidth(WIDTH);
+        primaryStage.setHeight(HEIGHT);
     }
 
-    // Метод 1: Переход по кнопке (из контроллера)
+    // Метод для смены языка
+    public static void switchLanguage(Locale locale) {
+        currentLocale = locale;
+        // Перезагружаем текущую сцену (если нужно), но пока просто сохраняем
+    }
+
+    public static Locale getCurrentLocale() {
+        return currentLocale;
+    }
+
     public static void switchScene(Event event, String fxmlPath, String title) {
         switchInternal(fxmlPath, title);
     }
 
-    // Метод 2: Переход без события (для Login/Register)
     public static void switchTo(String viewPath) {
         String path = viewPath.startsWith("/") ? viewPath : "/" + viewPath;
-        // Если забыли /ui/, добавляем
         if (!path.contains("/ui/")) {
             String filename = path.substring(path.lastIndexOf('/') + 1);
             path = "/ui/" + filename;
@@ -47,7 +54,6 @@ public class SceneSwitcher {
         try {
             URL resource = SceneSwitcher.class.getResource(fxmlPath);
             if (resource == null) {
-                // Пытаемся найти файл, если путь неточный
                 String filename = fxmlPath.substring(fxmlPath.lastIndexOf('/') + 1);
                 resource = SceneSwitcher.class.getResource("/ui/" + filename);
             }
@@ -56,7 +62,12 @@ public class SceneSwitcher {
                 throw new RuntimeException("CRITICAL ERROR: FXML not found: " + fxmlPath);
             }
 
+            // ВАЖНО: Загружаем Bundle с переводами
+            ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", currentLocale);
+
             FXMLLoader loader = new FXMLLoader(resource);
+            loader.setResources(bundle); // <-- Передаем переводы в FXML
+
             Parent root = loader.load();
 
             if (primaryStage != null) {
@@ -65,7 +76,6 @@ public class SceneSwitcher {
                     scene = new Scene(root, WIDTH, HEIGHT);
                     primaryStage.setScene(scene);
                 } else {
-                    // Просто меняем содержимое (root), размер окна остается старым!
                     scene.setRoot(root);
                 }
 

@@ -9,7 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import sk.upjs.ics.spendwise.entity.Account;
-import sk.upjs.ics.spendwise.entity.CategoryType; // ВАЖНЫЙ ИМПОРТ
+import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.TransactionService;
@@ -17,7 +17,9 @@ import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class DashboardController {
@@ -28,11 +30,16 @@ public class DashboardController {
 
     private final TransactionService transactionService = new TransactionService();
     private final AccountService accountService = new AccountService();
-
     private final Long currentUserId = 1L;
+
+    // Ресурсы для перевода кода (например, для ComboBox)
+    private ResourceBundle resources;
 
     @FXML
     public void initialize() {
+        // Получаем текущие ресурсы
+        resources = ResourceBundle.getBundle("i18n/messages", SceneSwitcher.getCurrentLocale());
+
         setupAccountSelector();
 
         accountSelector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -44,11 +51,30 @@ public class DashboardController {
         accountSelector.getSelectionModel().selectFirst();
     }
 
+    // --- КНОПКИ ЯЗЫКОВ ---
+    @FXML
+    void setLangEn(ActionEvent event) {
+        changeLanguage(new Locale("en"), event);
+    }
+
+    @FXML
+    void setLangSk(ActionEvent event) {
+        changeLanguage(new Locale("sk"), event);
+    }
+
+    private void changeLanguage(Locale locale, ActionEvent event) {
+        SceneSwitcher.switchLanguage(locale);
+        // Перезагружаем Dashboard, чтобы применился язык
+        SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
+    }
+    // ---------------------
+
     private void setupAccountSelector() {
         List<Account> userAccounts = accountService.getAll(currentUserId);
         Account allAccountsOption = new Account();
         allAccountsOption.setId(-1L);
-        allAccountsOption.setName("All Accounts");
+        // Берем текст из ресурсов
+        allAccountsOption.setName(resources.getString("dashboard.all_accounts"));
 
         ObservableList<Account> options = FXCollections.observableArrayList();
         options.add(allAccountsOption);
@@ -61,30 +87,23 @@ public class DashboardController {
                 return account == null ? "" : account.getName();
             }
             @Override
-            public Account fromString(String string) {
-                return null;
-            }
+            public Account fromString(String string) { return null; }
         });
     }
 
     private void loadChartData(Account selectedAccount) {
         try {
-            System.out.println("--- Loading Chart Data ---");
             List<Transaction> transactions = transactionService.getAll(currentUserId);
 
-            // 1. Фильтр по аккаунту
             if (selectedAccount.getId() != -1L) {
                 transactions = transactions.stream()
                         .filter(t -> t.getAccountId().equals(selectedAccount.getId()))
                         .collect(Collectors.toList());
             }
 
-            // 2. ИСПРАВЛЕННЫЙ ФИЛЬТР: Сравниваем Enum с Enum
             List<Transaction> expensesOnly = transactions.stream()
                     .filter(t -> t.getType() == CategoryType.EXPENSE)
                     .toList();
-
-            System.out.println("Found expenses: " + expensesOnly.size());
 
             if (expensesOnly.isEmpty()) {
                 expenseChart.setVisible(false);
@@ -95,7 +114,6 @@ public class DashboardController {
             expenseChart.setVisible(true);
             emptyStateBox.setVisible(false);
 
-            // 3. Группируем
             Map<String, BigDecimal> expensesByCategory = expensesOnly.stream()
                     .filter(t -> t.getCategoryName() != null)
                     .collect(Collectors.toMap(
@@ -108,7 +126,6 @@ public class DashboardController {
             for (Map.Entry<String, BigDecimal> entry : expensesByCategory.entrySet()) {
                 pieData.add(new PieChart.Data(entry.getKey(), entry.getValue().doubleValue()));
             }
-
             expenseChart.setData(pieData);
 
         } catch (Exception e) {
