@@ -3,6 +3,8 @@ package sk.upjs.ics.spendwise.service;
 import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 public class TransactionService {
@@ -17,7 +19,11 @@ public class TransactionService {
         transactionDao.save(transaction);
     }
 
-    public void delete(Long id) {
-        transactionDao.delete(id);
+    public void delete(Long id, Long userId) {
+        transactionDao.delete(id, userId);
+    }
+
+    public BigDecimal getExpenseSumForAccountBetween(Long userId, Long accountId, Instant fromInclusive, Instant toInclusive) {
+        return transactionDao.sumExpensesForAccountBetween(userId, accountId, fromInclusive, toInclusive);
     }
 }

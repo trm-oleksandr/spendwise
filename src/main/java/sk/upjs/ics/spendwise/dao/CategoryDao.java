@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface CategoryDao {
     List<Category> getAll(Long userId);
-    Optional<Category> getById(Long id);
+    Optional<Category> getById(Long id, Long userId);
     Category save(Category category);
-    boolean delete(Long id);
+    boolean delete(Long id, Long userId);
 }

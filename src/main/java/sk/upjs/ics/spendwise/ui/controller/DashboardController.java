@@ -14,6 +14,7 @@ import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.TransactionService;
+import sk.upjs.ics.spendwise.security.AuthContext;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -35,7 +36,6 @@ public class DashboardController {
 
     private final TransactionService transactionService = new TransactionService();
     private final AccountService accountService = new AccountService();
-    private final Long currentUserId = 1L;
     private ResourceBundle resources;
 
     @FXML
@@ -94,7 +94,7 @@ public class DashboardController {
     // --------------------------------
 
     private void setupAccountSelector() {
-        List<Account> userAccounts = accountService.getAll(currentUserId);
+        List<Account> userAccounts = accountService.getAll(getCurrentUserId());
         Account allAccountsOption = new Account();
         allAccountsOption.setId(-1L);
         allAccountsOption.setName(resources.getString("dashboard.all_accounts"));
@@ -116,7 +116,7 @@ public class DashboardController {
 
     private void loadChartData(Account selectedAccount) {
         try {
-            List<Transaction> transactions = transactionService.getAll(currentUserId);
+            List<Transaction> transactions = transactionService.getAll(getCurrentUserId());
 
             if (selectedAccount.getId() != -1L) {
                 transactions = transactions.stream()
@@ -157,7 +157,15 @@ public class DashboardController {
     }
 
     @FXML void showAccounts(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts"); }
-    @FXML void logout(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login"); }
+    @FXML void logout(ActionEvent event) { AuthContext.clear(); SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login"); }
     @FXML void showCategories(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/categories.fxml", "Manage Categories"); }
-    @FXML void showTransactions(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions"); }
+    @FXML void showTransactions(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions");}
+    @FXML void showBudgets(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/budgets.fxml", "Budgets"); }
+
+    private Long getCurrentUserId() {
+        if (AuthContext.getCurrentUser() == null) {
+            throw new IllegalStateException("No authenticated user in context");
+        }
+        return AuthContext.getCurrentUser().getId();
+    }
 }

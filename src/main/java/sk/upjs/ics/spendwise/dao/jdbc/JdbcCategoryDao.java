@@ -37,10 +37,10 @@ public class JdbcCategoryDao implements CategoryDao {
     }
 
     @Override
-    public Optional<Category> getById(Long id) {
-        String sql = "SELECT * FROM category WHERE id = ?";
+    public Optional<Category> getById(Long id, Long userId) {
+        String sql = "SELECT * FROM category WHERE id = ? AND user_id = ?";
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, categoryMapper, id));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, categoryMapper, id, userId));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -63,15 +63,15 @@ public class JdbcCategoryDao implements CategoryDao {
 
             return category;
         } else {
-            String sql = "UPDATE category SET name = ?, type = ? WHERE id = ?";
-            jdbcTemplate.update(sql, category.getName(), category.getType().name(), category.getId());
+            String sql = "UPDATE category SET name = ?, type = ? WHERE id = ? AND user_id = ?";
+            jdbcTemplate.update(sql, category.getName(), category.getType().name(), category.getId(), category.getUserId());
             return category;
         }
     }
 
     @Override
-    public boolean delete(Long id) {
-        String sql = "DELETE FROM category WHERE id = ?";
-        return jdbcTemplate.update(sql, id) > 0;
+    public boolean delete(Long id, Long userId) {
+        String sql = "DELETE FROM category WHERE id = ? AND user_id = ?";
+        return jdbcTemplate.update(sql, id, userId) > 0;
     }
 }

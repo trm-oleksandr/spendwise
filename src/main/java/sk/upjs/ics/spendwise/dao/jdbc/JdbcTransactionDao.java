@@ -9,11 +9,13 @@ import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional; // ОБЯЗАТЕЛЬНО
 
@@ -43,19 +45,19 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public Optional<Transaction> getById(Long id) { // Возвращаем Optional
+    public Optional<Transaction> getById(Long id, Long userId) { // Возвращаем Optional
         String sql = """
-            SELECT 
+            SELECT
                 t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,
                 c.name AS category_name, c.type AS category_type,
                 a.name AS account_name
             FROM txn t
             JOIN category c ON t.category_id = c.id
             JOIN account a ON t.account_id = a.id
-            WHERE t.id = ?
+            WHERE t.id = ? AND t.user_id = ?
         """;
         try {
-            Transaction t = jdbcTemplate.queryForObject(sql, new TransactionMapper(), id);
+            Transaction t = jdbcTemplate.queryForObject(sql, new TransactionMapper(), id, userId);
             return Optional.ofNullable(t);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -83,10 +85,27 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public boolean delete(Long id) { // Возвращаем boolean
-        String sql = "DELETE FROM txn WHERE id = ?";
-        int rows = jdbcTemplate.update(sql, id);
+    public boolean delete(Long id, Long userId) { // Возвращаем boolean
+        String sql = "DELETE FROM txn WHERE id = ? AND user_id = ?";
+        int rows = jdbcTemplate.update(sql, id, userId);
         return rows > 0;
+    }
+
+    @Override
+    public BigDecimal sumExpensesForAccountBetween(Long userId, Long accountId, Instant fromInclusive, Instant toInclusive) {
+        String sql = """
+            SELECT COALESCE(SUM(t.amount), 0) AS total
+            FROM txn t
+            JOIN category c ON t.category_id = c.id
+            WHERE t.user_id = ?
+              AND t.account_id = ?
+              AND c.type = 'EXPENSE'
+              AND t.occurred_at >= ?
+              AND t.occurred_at <= ?
+        """;
+        Timestamp fromTs = Timestamp.from(fromInclusive);
+        Timestamp toTs = Timestamp.from(toInclusive);
+        return jdbcTemplate.queryForObject(sql, BigDecimal.class, userId, accountId, fromTs, toTs);
     }
 
     private static class TransactionMapper implements RowMapper<Transaction> {
