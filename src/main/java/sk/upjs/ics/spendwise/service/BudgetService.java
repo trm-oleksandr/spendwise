@@ -12,8 +12,17 @@ import java.util.Optional;
 
 public class BudgetService {
 
-    private final BudgetDao budgetDao = JdbcDaoFactory.INSTANCE.budgetDao();
-    private final TransactionService transactionService = new TransactionService();
+    private final BudgetDao budgetDao;
+    private final TransactionService transactionService;
+
+    public BudgetService() {
+        this(JdbcDaoFactory.INSTANCE.budgetDao(), new TransactionService());
+    }
+
+    public BudgetService(BudgetDao budgetDao, TransactionService transactionService) {
+        this.budgetDao = budgetDao;
+        this.transactionService = transactionService;
+    }
 
     public List<Budget> getAll(Long userId) {
         List<Budget> budgets = budgetDao.getAll(userId);

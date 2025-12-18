@@ -7,7 +7,15 @@ import java.util.List;
 
 public class CategoryService {
 
-    private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
+    private final CategoryDao categoryDao;
+
+    public CategoryService() {
+        this(JdbcDaoFactory.INSTANCE.categoryDao());
+    }
+
+    public CategoryService(CategoryDao categoryDao) {
+        this.categoryDao = categoryDao;
+    }
 
     public List<Category> getAll(Long userId) {
         return categoryDao.getAll(userId);

@@ -5,14 +5,14 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import sk.upjs.ics.spendwise.dao.AccountDao;
-import sk.upjs.ics.spendwise.dao.CategoryDao;
-import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
 import sk.upjs.ics.spendwise.entity.Transaction;
-import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
+import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
+import sk.upjs.ics.spendwise.service.AccountService;
+import sk.upjs.ics.spendwise.service.CategoryService;
+import sk.upjs.ics.spendwise.service.TransactionService;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
 import java.math.BigDecimal;
@@ -40,9 +40,9 @@ public class TransactionsController {
     @FXML private Button deleteBtn;
     @FXML private Button backBtn;
 
-    private final TransactionDao transactionDao = JdbcDaoFactory.INSTANCE.transactionDao();
-    private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
-    private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
+    private final TransactionService transactionService = DefaultServiceFactory.INSTANCE.transactionService();
+    private final AccountService accountService = DefaultServiceFactory.INSTANCE.accountService();
+    private final CategoryService categoryService = DefaultServiceFactory.INSTANCE.categoryService();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
@@ -78,7 +78,7 @@ public class TransactionsController {
         deleteBtn.setOnAction(e -> {
             Transaction selected = transactionsTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                transactionDao.delete(selected.getId(), getCurrentUserId());
+                transactionService.delete(selected.getId(), getCurrentUserId());
                 refreshTable();
             } else {
                 new Alert(Alert.AlertType.WARNING, "Select transaction first!").show();
@@ -87,13 +87,13 @@ public class TransactionsController {
     }
 
     private void loadFilters() {
-        accountFilter.setItems(FXCollections.observableArrayList(accountDao.getAll(getCurrentUserId())));
-        categoryFilter.setItems(FXCollections.observableArrayList(categoryDao.getAll(getCurrentUserId())));
+        accountFilter.setItems(FXCollections.observableArrayList(accountService.getAll(getCurrentUserId())));
+        categoryFilter.setItems(FXCollections.observableArrayList(categoryService.getAll(getCurrentUserId())));
     }
 
     private void refreshTable() {
         try {
-            List<Transaction> all = transactionDao.getAll(getCurrentUserId());
+            List<Transaction> all = transactionService.getAll(getCurrentUserId());
 
             Account selAccount = accountFilter.getValue();
             Category selCategory = categoryFilter.getValue();

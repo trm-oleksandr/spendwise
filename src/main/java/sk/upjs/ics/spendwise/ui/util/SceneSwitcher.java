@@ -13,18 +13,17 @@ import java.util.ResourceBundle;
 public class SceneSwitcher {
 
     private static Stage primaryStage;
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 700;
+    private static final int MIN_WIDTH = 900;
+    private static final int MIN_HEIGHT = 650;
 
     // По умолчанию Английский
     private static Locale currentLocale = new Locale("en");
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
-        primaryStage.setMinWidth(WIDTH);
-        primaryStage.setMinHeight(HEIGHT);
-        primaryStage.setWidth(WIDTH);
-        primaryStage.setHeight(HEIGHT);
+        primaryStage.setMinWidth(MIN_WIDTH);
+        primaryStage.setMinHeight(MIN_HEIGHT);
+        primaryStage.setResizable(true);
     }
 
     // Метод для смены языка
@@ -73,8 +72,9 @@ public class SceneSwitcher {
             if (primaryStage != null) {
                 Scene scene = primaryStage.getScene();
                 if (scene == null) {
-                    scene = new Scene(root, WIDTH, HEIGHT);
+                    scene = new Scene(root);
                     primaryStage.setScene(scene);
+                    primaryStage.sizeToScene();
                 } else {
                     scene.setRoot(root);
                 }
