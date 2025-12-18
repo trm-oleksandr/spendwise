@@ -19,7 +19,7 @@ public class SceneSwitcher {
     private static final int MIN_WIDTH = 900;
     private static final int MIN_HEIGHT = 650;
 
-    // По умолчанию Английский
+    // default en
     private static Locale currentLocale = new Locale("en");
 
     public static void setStage(Stage stage) {
@@ -29,10 +29,9 @@ public class SceneSwitcher {
         primaryStage.setResizable(true);
     }
 
-    // Метод для смены языка
+    // change lang
     public static void switchLanguage(Locale locale) {
         currentLocale = locale;
-        // Перезагружаем текущую сцену (если нужно), но пока просто сохраняем
     }
 
     public static Locale getCurrentLocale() {
@@ -73,7 +72,7 @@ public class SceneSwitcher {
                 throw new RuntimeException("CRITICAL ERROR: FXML not found: " + fxmlPath);
             }
 
-            // ИЗМЕНЕНИЕ ЗДЕСЬ: Добавили new Utf8Control()
+            // Utf8Control
             ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", currentLocale, new Utf8Control());
 
             FXMLLoader loader = new FXMLLoader(resource);

@@ -1,5 +1,5 @@
 package sk.upjs.ics.spendwise.entity;
-
+//Хранит логин и хэш пароля
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
