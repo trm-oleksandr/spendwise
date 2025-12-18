@@ -27,50 +27,61 @@ public class CategoriesController {
     @FXML private Button deleteButton;
     @FXML private Button backButton;
 
+    // Получаем доступ к БД через фабрику
     private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
-    private final Long currentUserId = 1L; // Заглушка, позже заменим
+
+    // ВРЕМЕННО: заглушка пользователя (позже будет AuthContext)
+    private final Long currentUserId = 1L;
 
     @FXML
     public void initialize() {
-        // Настройка таблицы
+        // 1. Настраиваем колонки таблицы
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
-        // Заполнение выпадающего списка (INCOME, EXPENSE)
+        // 2. Заполняем выпадающий список (Доход / Расход)
         typeComboBox.setItems(FXCollections.observableArrayList(CategoryType.values()));
-        typeComboBox.getSelectionModel().select(CategoryType.EXPENSE); // По умолчанию Расход
+        typeComboBox.getSelectionModel().select(CategoryType.EXPENSE); // По умолчанию "Расход"
 
-        // Загрузка данных
+        // 3. Загружаем данные из БД
         refreshTable();
 
-        // Логика кнопок
+        // 4. Настраиваем кнопки
         addButton.setOnAction(this::onAdd);
         deleteButton.setOnAction(this::onDelete);
-        backButton.setOnAction(event ->
-                SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard")
-        );
+
+        // Кнопка "Назад"
+        backButton.setOnAction(event -> {
+            SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
+        });
     }
 
     private void onAdd(ActionEvent event) {
-        String name = nameField.getText().trim();
-        CategoryType type = typeComboBox.getValue();
+        try {
+            String name = nameField.getText().trim();
+            CategoryType type = typeComboBox.getValue();
 
-        if (name.isEmpty() || type == null) {
-            new Alert(Alert.AlertType.WARNING, "Please enter name and type!").show();
-            return;
+            if (name.isEmpty() || type == null) {
+                new Alert(Alert.AlertType.WARNING, "Please enter name and type!").show();
+                return;
+            }
+
+            Category c = new Category();
+            c.setUserId(currentUserId); // ВАЖНО: Убедись, что юзер с ID=1 есть в БД!
+            c.setName(name);
+            c.setType(type);
+
+            categoryDao.save(c);
+
+            // Очистка полей и обновление
+            nameField.clear();
+            refreshTable();
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Ошибка покажется в консоли IDEA
+            new Alert(Alert.AlertType.ERROR, "Error saving category: " + e.getMessage()).show();
         }
-
-        Category c = new Category();
-        c.setUserId(currentUserId);
-        c.setName(name);
-        c.setType(type);
-
-        categoryDao.save(c);
-
-        // Очистка полей и обновление
-        nameField.clear();
-        refreshTable();
     }
 
     private void onDelete(ActionEvent event) {
@@ -84,6 +95,7 @@ public class CategoriesController {
     }
 
     private void refreshTable() {
+        // Получаем все категории пользователя из БД
         List<Category> list = categoryDao.getAll(currentUserId);
         categoriesTable.setItems(FXCollections.observableArrayList(list));
     }

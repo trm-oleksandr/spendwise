@@ -2,7 +2,6 @@ package sk.upjs.ics.spendwise.ui.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -37,7 +36,6 @@ public class TransactionsController {
     @FXML private Label totalLabel;
 
     @FXML private Button addBtn;
-    @FXML private Button editBtn;
     @FXML private Button deleteBtn;
     @FXML private Button backBtn;
 
@@ -45,15 +43,14 @@ public class TransactionsController {
     private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
     private final CategoryDao categoryDao = JdbcDaoFactory.INSTANCE.categoryDao();
 
-    // Заглушка пользователя (позже заменим на AuthContext)
-    private final Long currentUserId = 1L;
+    private final Long currentUserId = 1L; // Хардкод ID, так как AuthContext не подключен
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
 
     @FXML
     public void initialize() {
-        // Настройка колонок таблицы
+        // Настройка таблицы
         dateCol.setCellValueFactory(cell -> new SimpleStringProperty(formatter.format(cell.getValue().getOccurredAt())));
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
         typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -61,15 +58,13 @@ public class TransactionsController {
         accountCol.setCellValueFactory(new PropertyValueFactory<>("accountName"));
         noteCol.setCellValueFactory(new PropertyValueFactory<>("note"));
 
-        // Загрузка фильтров
         loadFilters();
-
-        // Загрузка данных
         refreshTable();
 
         // События
         accountFilter.setOnAction(e -> refreshTable());
         categoryFilter.setOnAction(e -> refreshTable());
+
         resetBtn.setOnAction(e -> {
             accountFilter.getSelectionModel().clearSelection();
             categoryFilter.getSelectionModel().clearSelection();
@@ -78,20 +73,17 @@ public class TransactionsController {
 
         backBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/dashboard.fxml", "Dashboard"));
 
-        // Удаление
+        addBtn.setOnAction(e -> SceneSwitcher.switchScene(e, "/ui/transaction_edit.fxml", "New Transaction"));
+
         deleteBtn.setOnAction(e -> {
             Transaction selected = transactionsTable.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                new Alert(Alert.AlertType.WARNING, "Please select a transaction to delete.").show();
-                return;
+            if (selected != null) {
+                transactionDao.delete(selected.getId());
+                refreshTable();
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Select transaction first!").show();
             }
-            transactionDao.delete(selected.getId());
-            refreshTable();
         });
-
-        // Заглушки для Add/Edit (сделаем следующим шагом)
-        addBtn.setOnAction(e -> new Alert(Alert.AlertType.INFORMATION, "Add Window coming next!").show());
-        editBtn.setOnAction(e -> new Alert(Alert.AlertType.INFORMATION, "Edit functionality coming soon.").show());
     }
 
     private void loadFilters() {
@@ -100,23 +92,26 @@ public class TransactionsController {
     }
 
     private void refreshTable() {
-        List<Transaction> all = transactionDao.getAll(currentUserId);
+        try {
+            List<Transaction> all = transactionDao.getAll(currentUserId);
 
-        Account selAccount = accountFilter.getValue();
-        Category selCategory = categoryFilter.getValue();
+            Account selAccount = accountFilter.getValue();
+            Category selCategory = categoryFilter.getValue();
 
-        // Фильтрация
-        List<Transaction> filtered = all.stream()
-                .filter(t -> selAccount == null || t.getAccountId().equals(selAccount.getId()))
-                .filter(t -> selCategory == null || t.getCategoryId().equals(selCategory.getId()))
-                .collect(Collectors.toList());
+            List<Transaction> filtered = all.stream()
+                    .filter(t -> selAccount == null || t.getAccountId().equals(selAccount.getId()))
+                    .filter(t -> selCategory == null || t.getCategoryId().equals(selCategory.getId()))
+                    .collect(Collectors.toList());
 
-        transactionsTable.setItems(FXCollections.observableArrayList(filtered));
+            transactionsTable.setItems(FXCollections.observableArrayList(filtered));
 
-        // Подсчет итогов (просто сумма для красоты)
-        BigDecimal total = filtered.stream()
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        totalLabel.setText("Total: " + total + " €");
+            // Подсчет суммы
+            BigDecimal total = filtered.stream()
+                    .map(Transaction::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalLabel.setText("Total: " + total + " €");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
