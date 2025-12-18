@@ -50,7 +50,9 @@
                         <Label text="Amount (€):" GridPane.rowIndex="3" />
                         <TextField fx:id="amountField" promptText="e.g. 15.50" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                        <Label text="Note:" GridPane.rowIndex="4" valignment="TOP" />
+                        <Label text="Note:" GridPane.rowIndex="4">
+                            <GridPane.valignment>TOP</GridPane.valignment>
+                        </Label>
                         <TextArea fx:id="noteArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
                 </GridPane>

@@ -16,8 +16,8 @@ public class DashboardController {
 
     @FXML
     void logout(ActionEvent event) {
-        // Возвращаемся на логин
-        SceneSwitcher.switchScene(event, "/sk/upjs/ics/spendwise/ui/scene/login.fxml", "Login");
+        // Исправленный путь: ищем прямо в папке ui
+        SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login");
     }
 
     @FXML

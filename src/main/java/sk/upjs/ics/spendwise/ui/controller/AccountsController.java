@@ -1,85 +1,90 @@
 package sk.upjs.ics.spendwise.ui.controller;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.dao.AccountDao;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.factory.JdbcDaoFactory;
-import sk.upjs.ics.spendwise.entity.AppUser;
 import sk.upjs.ics.spendwise.ui.util.SceneSwitcher;
 
+import java.time.Instant;
 import java.util.List;
 
 public class AccountsController {
 
-    @FXML
-    private TableView<Account> accountsTable;
+    @FXML private TableView<Account> accountsTable;
+    @FXML private TableColumn<Account, Long> idCol;
+    @FXML private TableColumn<Account, String> nameCol;
+    @FXML private TableColumn<Account, String> currencyCol;
 
-    @FXML
-    private TableColumn<Account, Long> idCol;
+    @FXML private TextField nameField;      // Новое поле
+    @FXML private TextField currencyField;  // Новое поле
 
-    @FXML
-    private TableColumn<Account, String> nameCol;
-
-    @FXML
-    private TableColumn<Account, String> currencyCol;
-
-    @FXML
-    private Button addButton;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Button backButton;
+    @FXML private Button addButton;
+    @FXML private Button deleteButton;
+    @FXML private Button backButton;
 
     private final AccountDao accountDao = JdbcDaoFactory.INSTANCE.accountDao();
-
-    // ВРЕМЕННО: Пока у нас нет передачи залогиненного юзера, хардкодим ID = 1
-    // Позже мы заменим это на AuthContext.getCurrentUser().getId()
     private final Long currentUserId = 1L;
 
     @FXML
     public void initialize() {
-        // Настраиваем колонки таблицы (связываем с полями класса Account)
+        // 1. Настройка таблицы
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         currencyCol.setCellValueFactory(new PropertyValueFactory<>("currency"));
 
+        // 2. Загрузка данных
+        refreshTable();
+
+        // 3. Кнопки
+        addButton.setOnAction(this::onAdd);
+        deleteButton.setOnAction(this::onDelete);
+
+        // Исправленная кнопка "Назад"
         backButton.setOnAction(event -> {
             SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
         });
+    }
 
-        // Загружаем данные
-        refreshTable();
+    private void onAdd(ActionEvent event) {
+        try {
+            String name = nameField.getText().trim();
+            String currency = currencyField.getText().trim();
 
-        // Простая логика кнопок (пока заглушки)
-        addButton.setOnAction(event -> {
-            // Тут будет логика добавления. Пока просто создадим тестовый счет
-            Account newAccount = new Account();
-            newAccount.setUserId(currentUserId);
-            newAccount.setName("New Account " + System.currentTimeMillis() % 1000);
-            newAccount.setCurrency("EUR");
-            accountDao.save(newAccount);
-            refreshTable();
-        });
-
-        deleteButton.setOnAction(event -> {
-            Account selected = accountsTable.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                accountDao.delete(selected.getId());
-                refreshTable();
-            } else {
-                new Alert(Alert.AlertType.WARNING, "Select an account first!").show();
+            if (name.isEmpty() || currency.isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Enter name and currency!").show();
+                return;
             }
-        });
 
-        // Кнопку "Back" пока не трогаем, так как сцены еще не переключаются
+            Account a = new Account();
+            a.setUserId(currentUserId);
+            a.setName(name);
+            a.setCurrency(currency);
+            a.setCreatedAt(Instant.now());
+
+            accountDao.save(a);
+
+            nameField.clear();
+            refreshTable();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Error: " + e.getMessage()).show();
+        }
+    }
+
+    private void onDelete(ActionEvent event) {
+        Account selected = accountsTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            accountDao.delete(selected.getId());
+            refreshTable();
+        } else {
+            new Alert(Alert.AlertType.WARNING, "Select account first!").show();
+        }
     }
 
     private void refreshTable() {
