@@ -23,9 +23,9 @@
                         <ComboBox fx:id="typeFilterBox">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="ALL" />
-                                    <String fx:value="INCOME" />
-                                    <String fx:value="EXPENSE" />
+                                    <fx:String>ALL</fx:String>
+                                    <fx:String>INCOME</fx:String>
+                                    <fx:String>EXPENSE</fx:String>
                                 </FXCollections>
                             </items>
                         </ComboBox>
