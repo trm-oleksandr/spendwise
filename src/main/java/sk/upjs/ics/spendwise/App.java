@@ -1,4 +1,4 @@
-package sk.upjs.ics.spendwise.ui; // <--- Исправлено: папка ui
+package sk.upjs.ics.spendwise;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
