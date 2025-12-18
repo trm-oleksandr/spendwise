@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.lang.String?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="sk.upjs.ics.spendwise.ui.controller.TransactionsController">
@@ -23,9 +24,9 @@
                         <ComboBox fx:id="typeFilterBox">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <fx:String>ALL</fx:String>
-                                    <fx:String>INCOME</fx:String>
-                                    <fx:String>EXPENSE</fx:String>
+                                    <String fx:value="ALL" />
+                                    <String fx:value="INCOME" />
+                                    <String fx:value="EXPENSE" />
                                 </FXCollections>
                             </items>
                         </ComboBox>
