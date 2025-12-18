@@ -17,6 +17,8 @@ public class SceneSwitcher {
     private static Stage primaryStage;
     private static final int MIN_WIDTH = 900;
     private static final int MIN_HEIGHT = 650;
+    private static final int AUTH_MIN_WIDTH = 520;
+    private static final int AUTH_MIN_HEIGHT = 520;
 
     // По умолчанию Английский
     private static Locale currentLocale = new Locale("en");
@@ -62,6 +64,9 @@ public class SceneSwitcher {
                 title = "Login";
             }
 
+            boolean isAuthScene = fxmlPath.toLowerCase(Locale.ROOT).contains("login.fxml")
+                || fxmlPath.toLowerCase(Locale.ROOT).contains("register.fxml");
+
             URL resource = SceneSwitcher.class.getResource(fxmlPath);
             if (resource == null) {
                 String filename = fxmlPath.substring(fxmlPath.lastIndexOf('/') + 1);
@@ -85,12 +90,13 @@ public class SceneSwitcher {
                 if (scene == null) {
                     scene = new Scene(root);
                     primaryStage.setScene(scene);
-                    primaryStage.sizeToScene();
                 } else {
                     scene.setRoot(root);
                 }
 
                 ThemeManager.applyTheme(scene);
+
+                updateStageSize(root, isAuthScene);
 
                 primaryStage.setTitle(title.isEmpty() ? "SpendWise" : "SpendWise - " + title);
                 primaryStage.show();
@@ -104,5 +110,31 @@ public class SceneSwitcher {
     private static boolean requiresAuthentication(String fxmlPath) {
         String normalized = fxmlPath.toLowerCase(Locale.ROOT);
         return !(normalized.contains("login.fxml") || normalized.contains("register.fxml"));
+    }
+
+    private static void updateStageSize(Parent root, boolean isAuthScene) {
+        if (primaryStage == null) {
+            return;
+        }
+
+        if (isAuthScene) {
+            double minWidth = root.prefWidth(-1);
+            double minHeight = root.prefHeight(-1);
+
+            if (Double.isNaN(minWidth) || minWidth <= 0) {
+                minWidth = AUTH_MIN_WIDTH;
+            }
+            if (Double.isNaN(minHeight) || minHeight <= 0) {
+                minHeight = AUTH_MIN_HEIGHT;
+            }
+
+            primaryStage.setMinWidth(minWidth);
+            primaryStage.setMinHeight(minHeight);
+        } else {
+            primaryStage.setMinWidth(MIN_WIDTH);
+            primaryStage.setMinHeight(MIN_HEIGHT);
+        }
+
+        primaryStage.sizeToScene();
     }
 }
