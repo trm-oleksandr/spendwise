@@ -19,6 +19,12 @@
     -fx-padding: 0 0 20 0;
 }
 
+.subheader-label {
+    -fx-text-fill: #4b5563;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10 0;
+}
+
 .label {
     -fx-text-fill: #374151;
 }

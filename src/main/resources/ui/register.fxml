@@ -4,32 +4,34 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15.0" alignment="CENTER" styleClass="root" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="sk.upjs.ics.spendwise.ui.controller.RegisterController">
+<StackPane styleClass="root" xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="sk.upjs.ics.spendwise.ui.controller.RegisterController">
 
-    <padding>
-        <Insets top="40.0" right="40.0" bottom="40.0" left="40.0" />
-    </padding>
+    <VBox spacing="15.0" alignment="CENTER" maxWidth="380.0">
+        <padding>
+            <Insets top="40.0" right="40.0" bottom="40.0" left="40.0" />
+        </padding>
 
-    <children>
-        <Label text="Create Account" styleClass="header-label" />
+        <children>
+            <Label text="Create Account" styleClass="header-label" />
 
-        <Label text="Join SpendWise today" style="-fx-text-fill: #aaaaaa;" />
+            <Label text="Join SpendWise today" styleClass="subheader-label" />
 
-        <TextField fx:id="usernameField" promptText="Username" />
-        <PasswordField fx:id="passwordField" promptText="Password" />
-        <PasswordField fx:id="repeatPasswordField" promptText="Repeat password" />
+            <TextField fx:id="usernameField" promptText="Username" />
+            <PasswordField fx:id="passwordField" promptText="Password" />
+            <PasswordField fx:id="repeatPasswordField" promptText="Repeat password" />
 
-        <HBox spacing="15.0" alignment="CENTER">
-            <children>
-                <Button text="Create" onAction="#onCreateAccount" defaultButton="true" styleClass="button-primary" prefWidth="100.0" />
+            <HBox spacing="15.0" alignment="CENTER">
+                <children>
+                    <Button text="Create" onAction="#onCreateAccount" defaultButton="true" styleClass="button-primary" prefWidth="120.0" />
 
-                <Button text="Back" onAction="#onBackToLogin" prefWidth="100.0" />
-            </children>
-            <VBox.margin>
-                <Insets top="10.0" />
-            </VBox.margin>
-        </HBox>
-    </children>
-</VBox>
+                    <Button text="Back" onAction="#onBackToLogin" prefWidth="120.0" />
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </HBox>
+        </children>
+    </VBox>
+
+</StackPane>
