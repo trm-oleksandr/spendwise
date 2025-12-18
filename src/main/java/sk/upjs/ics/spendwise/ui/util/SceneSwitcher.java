@@ -1,40 +1,90 @@
 package sk.upjs.ics.spendwise.ui.util;
 
-import java.io.IOException;
-import java.net.URL;
-
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-public final class SceneSwitcher {
-    private static Stage stage;
+public class SceneSwitcher {
 
-    private SceneSwitcher() {
-    }
+    private static Stage primaryStage;
+    private static final int WIDTH = 1000;
+    private static final int HEIGHT = 700;
+
+    // По умолчанию Английский
+    private static Locale currentLocale = new Locale("en");
 
     public static void setStage(Stage stage) {
-        SceneSwitcher.stage = stage;
+        primaryStage = stage;
+        primaryStage.setMinWidth(WIDTH);
+        primaryStage.setMinHeight(HEIGHT);
+        primaryStage.setWidth(WIDTH);
+        primaryStage.setHeight(HEIGHT);
     }
 
-    public static void switchTo(String fxmlPath) {
-        if (stage == null) {
-            throw new IllegalStateException("Stage has not been set. Call setStage before switching scenes.");
-        }
+    // Метод для смены языка
+    public static void switchLanguage(Locale locale) {
+        currentLocale = locale;
+        // Перезагружаем текущую сцену (если нужно), но пока просто сохраняем
+    }
 
-        URL resource = SceneSwitcher.class.getClassLoader().getResource(fxmlPath);
-        if (resource == null) {
-            throw new IllegalArgumentException("FXML file not found: " + fxmlPath);
-        }
+    public static Locale getCurrentLocale() {
+        return currentLocale;
+    }
 
+    public static void switchScene(Event event, String fxmlPath, String title) {
+        switchInternal(fxmlPath, title);
+    }
+
+    public static void switchTo(String viewPath) {
+        String path = viewPath.startsWith("/") ? viewPath : "/" + viewPath;
+        if (!path.contains("/ui/")) {
+            String filename = path.substring(path.lastIndexOf('/') + 1);
+            path = "/ui/" + filename;
+        }
+        switchInternal(path, "SpendWise");
+    }
+
+    private static void switchInternal(String fxmlPath, String title) {
         try {
-            Parent root = FXMLLoader.load(resource);
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+            URL resource = SceneSwitcher.class.getResource(fxmlPath);
+            if (resource == null) {
+                String filename = fxmlPath.substring(fxmlPath.lastIndexOf('/') + 1);
+                resource = SceneSwitcher.class.getResource("/ui/" + filename);
+            }
+
+            if (resource == null) {
+                throw new RuntimeException("CRITICAL ERROR: FXML not found: " + fxmlPath);
+            }
+
+            // ИЗМЕНЕНИЕ ЗДЕСЬ: Добавили new Utf8Control()
+            ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", currentLocale, new Utf8Control());
+
+            FXMLLoader loader = new FXMLLoader(resource);
+            loader.setResources(bundle);
+
+            Parent root = loader.load();
+
+            if (primaryStage != null) {
+                Scene scene = primaryStage.getScene();
+                if (scene == null) {
+                    scene = new Scene(root, WIDTH, HEIGHT);
+                    primaryStage.setScene(scene);
+                } else {
+                    scene.setRoot(root);
+                }
+
+                primaryStage.setTitle(title.isEmpty() ? "SpendWise" : "SpendWise - " + title);
+                primaryStage.show();
+            }
+
         } catch (IOException e) {
-            throw new RuntimeException("Unable to load FXML file: " + fxmlPath, e);
+            e.printStackTrace();
         }
     }
 }

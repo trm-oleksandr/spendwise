@@ -2,33 +2,65 @@ package sk.upjs.ics.spendwise.factory;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import sk.upjs.ics.spendwise.config.AppConfig;
+import sk.upjs.ics.spendwise.dao.AccountDao;
+import sk.upjs.ics.spendwise.dao.CategoryDao;
+import sk.upjs.ics.spendwise.dao.TransactionDao;
 import sk.upjs.ics.spendwise.dao.UserDao;
+import sk.upjs.ics.spendwise.dao.jdbc.JdbcAccountDao;
+import sk.upjs.ics.spendwise.dao.jdbc.JdbcCategoryDao;
+import sk.upjs.ics.spendwise.dao.jdbc.JdbcTransactionDao;
 import sk.upjs.ics.spendwise.dao.jdbc.JdbcUserDao;
 
-public class JdbcDaoFactory implements DaoFactory {
-    private static JdbcDaoFactory instance;
+public enum JdbcDaoFactory implements DaoFactory {
+    INSTANCE;
+
+    private final JdbcTemplate jdbcTemplate;
+
+    // Кешируем DAO
     private JdbcUserDao userDao;
+    private JdbcAccountDao accountDao;
+    private JdbcCategoryDao categoryDao;
+    private JdbcTransactionDao transactionDao;
 
-    private JdbcDaoFactory() {
+    JdbcDaoFactory() {
+        // ИСПРАВЛЕНО: Берем JdbcTemplate из уже существующего AppConfig
+        this.jdbcTemplate = AppConfig.getInstance().getJdbcTemplate();
     }
 
-    public static synchronized JdbcDaoFactory getInstance() {
-        if (instance == null) {
-            instance = new JdbcDaoFactory();
-        }
-        return instance;
+    // ИСПРАВЛЕНО: Добавлен метод, который ожидает LoginController
+    public static JdbcDaoFactory getInstance() {
+        return INSTANCE;
     }
 
-    public synchronized JdbcUserDao getUserDao() {
+    @Override
+    public UserDao userDao() {
         if (userDao == null) {
-            JdbcTemplate jdbcTemplate = AppConfig.getInstance().getJdbcTemplate();
             userDao = new JdbcUserDao(jdbcTemplate);
         }
         return userDao;
     }
 
     @Override
-    public UserDao userDao() {
-        return getUserDao();
+    public AccountDao accountDao() {
+        if (accountDao == null) {
+            accountDao = new JdbcAccountDao(jdbcTemplate);
+        }
+        return accountDao;
+    }
+
+    @Override
+    public CategoryDao categoryDao() {
+        if (categoryDao == null) {
+            categoryDao = new JdbcCategoryDao(jdbcTemplate);
+        }
+        return categoryDao;
+    }
+
+    @Override
+    public TransactionDao transactionDao() {
+        if (transactionDao == null) {
+            transactionDao = new JdbcTransactionDao(jdbcTemplate);
+        }
+        return transactionDao;
     }
 }

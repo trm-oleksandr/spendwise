@@ -1,9 +1,9 @@
 package sk.upjs.ics.spendwise;
 
-import sk.upjs.ics.spendwise.App;
+import sk.upjs.ics.spendwise.ui.App;
 
 public class IDELauncher {
     public static void main(String[] args) {
-        App.launch(App.class, args);
+        App.main(args);
     }
 }

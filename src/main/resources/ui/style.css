@@ -1,0 +1,223 @@
+/* ================================================================= */
+/* GLOBAL THEME ENGINE (МАГИЯ JAVA FX)                               */
+/* ================================================================= */
+.root {
+    /* Главный цвет приложения (Темно-серый, почти черный) */
+    -fx-base: #1f2937;
+
+    /* Цвет фона (чуть темнее базы) */
+    -fx-background: #111827;
+
+    /* Цвет акцента (Синий - как в Windows 11 / Mac) */
+    -fx-accent: #3b82f6;
+
+    /* Цвет фокуса (обводка при нажатии) */
+    -fx-focus-color: #3b82f6;
+    -fx-faint-focus-color: #3b82f622;
+
+    /* Цвет текста по умолчанию */
+    -fx-text-base-color: white;
+    -fx-text-background-color: white;
+
+    /* Шрифт */
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-size: 14px;
+}
+
+/* ================================================================= */
+/* HEADER & TEXT                                                     */
+/* ================================================================= */
+.header-label {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+    -fx-padding: 0 0 20 0;
+}
+
+.label {
+    -fx-text-fill: #e5e7eb; /* Светло-серый, читаемый */
+}
+
+/* ================================================================= */
+/* INPUT FIELDS (Поля ввода)                                         */
+/* ================================================================= */
+.text-field, .password-field, .text-area, .combo-box, .date-picker .text-field {
+    -fx-background-color: #374151; /* Светлее фона */
+    -fx-background-insets: 0;
+    -fx-background-radius: 6;
+    -fx-border-color: #4b5563;
+    -fx-border-radius: 6;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #9ca3af;
+    -fx-padding: 8;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: -fx-focus-color;
+    -fx-background-color: #374151;
+}
+
+/* Фикс для внутренней области TextArea */
+.text-area .content {
+    -fx-background-color: #374151;
+    -fx-text-fill: white;
+}
+
+/* ================================================================= */
+/* BUTTONS (Кнопки)                                                  */
+/* ================================================================= */
+.button {
+    -fx-background-color: #374151;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+    -fx-border-color: #4b5563;
+    -fx-border-radius: 6;
+}
+
+.button:hover {
+    -fx-background-color: #4b5563; /* Светлеет при наведении */
+}
+
+.button:pressed {
+    -fx-background-color: #1f2937;
+}
+
+/* Зеленая кнопка (Primary) */
+.button-primary {
+    -fx-background-color: #10b981; /* Emerald Green */
+    -fx-border-color: transparent;
+}
+.button-primary:hover {
+    -fx-background-color: #059669;
+}
+
+/* Красная кнопка (Danger) */
+.button-danger {
+    -fx-background-color: #ef4444; /* Rose Red */
+    -fx-border-color: transparent;
+}
+.button-danger:hover {
+    -fx-background-color: #dc2626;
+}
+
+/* ================================================================= */
+/* TABLE VIEW (Самое сложное)                                        */
+/* ================================================================= */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #4b5563;
+    -fx-border-radius: 4;
+}
+
+/* Шапка таблицы */
+.table-view .column-header-background {
+    -fx-background-color: #1f2937;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #4b5563;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 40px;
+    -fx-border-color: transparent #374151 transparent transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #60a5fa; /* Голубой цвет заголовков */
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Строки */
+.table-row-cell {
+    -fx-background-color: #111827; /* Цвет фона */
+    -fx-border-color: transparent transparent #1f2937 transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #161e2e; /* Чередование */
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #2563eb; /* Ярко-синий при выборе */
+}
+
+/* Текст в ячейках */
+.table-cell {
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+}
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+/* Пустая таблица */
+.table-view .placeholder .label {
+    -fx-text-fill: #6b7280;
+}
+
+/* ================================================================= */
+/* CHARTS (Графики)                                                  */
+/* ================================================================= */
+.chart {
+    -fx-text-fill: white;
+}
+.chart-title {
+    -fx-text-fill: white;
+    -fx-font-size: 1.2em;
+}
+.chart-pie-label {
+    -fx-fill: white;
+    -fx-font-size: 11px;
+}
+.chart-legend {
+    -fx-background-color: transparent;
+}
+.chart-legend-item {
+    -fx-text-fill: white;
+}
+
+/* ================================================================= */
+/* CUSTOM COMPONENTS                                                 */
+/* ================================================================= */
+/* Контейнер фильтров */
+.filter-bar {
+    -fx-background-color: #1f2937;
+    -fx-background-radius: 8;
+    -fx-border-color: #374151;
+    -fx-border-radius: 8;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+/* ... (остальной код) ... */
+
+/* --- ЯЗЫКОВЫЕ КНОПКИ --- */
+.lang-button {
+    -fx-background-color: #374151;
+    -fx-text-fill: #9ca3af; /* Серый текст для неактивных */
+    -fx-font-size: 14px;    /* Шрифт побольше */
+    -fx-font-weight: bold;
+    -fx-padding: 5 15;      /* Кнопки станут шире */
+    -fx-background-radius: 20; /* Закругленные края */
+    -fx-border-color: #4b5563;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+
+.lang-button:hover {
+    -fx-background-color: #4b5563;
+    -fx-text-fill: white;
+}
+
+/* СТИЛЬ ДЛЯ АКТИВНОЙ КНОПКИ (ВЫБРАННЫЙ ЯЗЫК) */
+.lang-button-active {
+    -fx-background-color: #3b82f6; /* Яркий синий */
+    -fx-text-fill: white;
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.4), 10, 0, 0, 0);
+}
