@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -28,17 +29,21 @@ public class DashboardController {
     @FXML private VBox emptyStateBox;
     @FXML private ComboBox<Account> accountSelector;
 
+    // Новые кнопки для управления стилем
+    @FXML private Button langEnBtn;
+    @FXML private Button langSkBtn;
+
     private final TransactionService transactionService = new TransactionService();
     private final AccountService accountService = new AccountService();
     private final Long currentUserId = 1L;
-
-    // Ресурсы для перевода кода (например, для ComboBox)
     private ResourceBundle resources;
 
     @FXML
     public void initialize() {
-        // Получаем текущие ресурсы
-        resources = ResourceBundle.getBundle("i18n/messages", SceneSwitcher.getCurrentLocale());
+        resources = ResourceBundle.getBundle("i18n/messages", SceneSwitcher.getCurrentLocale(), new sk.upjs.ics.spendwise.ui.util.Utf8Control());
+
+        // 1. Обновляем вид кнопок (подсветка активной)
+        updateLanguageButtons();
 
         setupAccountSelector();
 
@@ -51,7 +56,22 @@ public class DashboardController {
         accountSelector.getSelectionModel().selectFirst();
     }
 
-    // --- КНОПКИ ЯЗЫКОВ ---
+    // --- ЛОГИКА ПОДСВЕТКИ КНОПОК ---
+    private void updateLanguageButtons() {
+        Locale current = SceneSwitcher.getCurrentLocale();
+
+        // Сбрасываем стили (удаляем active класс)
+        langEnBtn.getStyleClass().remove("lang-button-active");
+        langSkBtn.getStyleClass().remove("lang-button-active");
+
+        // Добавляем active класс нужной кнопке
+        if (current.getLanguage().equals("sk")) {
+            langSkBtn.getStyleClass().add("lang-button-active");
+        } else {
+            langEnBtn.getStyleClass().add("lang-button-active");
+        }
+    }
+
     @FXML
     void setLangEn(ActionEvent event) {
         changeLanguage(new Locale("en"), event);
@@ -63,17 +83,20 @@ public class DashboardController {
     }
 
     private void changeLanguage(Locale locale, ActionEvent event) {
+        // Если язык уже выбран, ничего не делаем (чтобы не моргало)
+        if (SceneSwitcher.getCurrentLocale().getLanguage().equals(locale.getLanguage())) {
+            return;
+        }
+
         SceneSwitcher.switchLanguage(locale);
-        // Перезагружаем Dashboard, чтобы применился язык
         SceneSwitcher.switchScene(event, "/ui/dashboard.fxml", "Dashboard");
     }
-    // ---------------------
+    // --------------------------------
 
     private void setupAccountSelector() {
         List<Account> userAccounts = accountService.getAll(currentUserId);
         Account allAccountsOption = new Account();
         allAccountsOption.setId(-1L);
-        // Берем текст из ресурсов
         allAccountsOption.setName(resources.getString("dashboard.all_accounts"));
 
         ObservableList<Account> options = FXCollections.observableArrayList();

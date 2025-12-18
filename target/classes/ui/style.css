@@ -193,3 +193,31 @@
     -fx-padding: 10;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
 }
+
+/* ... (остальной код) ... */
+
+/* --- ЯЗЫКОВЫЕ КНОПКИ --- */
+.lang-button {
+    -fx-background-color: #374151;
+    -fx-text-fill: #9ca3af; /* Серый текст для неактивных */
+    -fx-font-size: 14px;    /* Шрифт побольше */
+    -fx-font-weight: bold;
+    -fx-padding: 5 15;      /* Кнопки станут шире */
+    -fx-background-radius: 20; /* Закругленные края */
+    -fx-border-color: #4b5563;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+
+.lang-button:hover {
+    -fx-background-color: #4b5563;
+    -fx-text-fill: white;
+}
+
+/* СТИЛЬ ДЛЯ АКТИВНОЙ КНОПКИ (ВЫБРАННЫЙ ЯЗЫК) */
+.lang-button-active {
+    -fx-background-color: #3b82f6; /* Яркий синий */
+    -fx-text-fill: white;
+    -fx-border-color: #2563eb;
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.4), 10, 0, 0, 0);
+}

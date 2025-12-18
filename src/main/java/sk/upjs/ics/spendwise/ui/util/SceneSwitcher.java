@@ -62,11 +62,11 @@ public class SceneSwitcher {
                 throw new RuntimeException("CRITICAL ERROR: FXML not found: " + fxmlPath);
             }
 
-            // ВАЖНО: Загружаем Bundle с переводами
-            ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", currentLocale);
+            // ИЗМЕНЕНИЕ ЗДЕСЬ: Добавили new Utf8Control()
+            ResourceBundle bundle = ResourceBundle.getBundle("i18n/messages", currentLocale, new Utf8Control());
 
             FXMLLoader loader = new FXMLLoader(resource);
-            loader.setResources(bundle); // <-- Передаем переводы в FXML
+            loader.setResources(bundle);
 
             Parent root = loader.load();
 
