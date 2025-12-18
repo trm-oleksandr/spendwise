@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import sk.upjs.ics.spendwise.entity.Account;
 import sk.upjs.ics.spendwise.entity.Category;
-import sk.upjs.ics.spendwise.entity.CategoryType;
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.factory.DefaultServiceFactory;
 import sk.upjs.ics.spendwise.security.AuthContext;
@@ -35,7 +34,6 @@ public class TransactionsController {
     @FXML private ComboBox<Account> accountFilter;
     @FXML private ComboBox<Category> categoryFilter;
     @FXML private Button resetBtn;
-    @FXML private Label totalLabel;
 
     @FXML private Button addBtn;
     @FXML private Button deleteBtn;
@@ -105,24 +103,6 @@ public class TransactionsController {
                     .collect(Collectors.toList());
 
             transactionsTable.setItems(FXCollections.observableArrayList(filtered));
-
-            BigDecimal total = filtered.stream()
-                    .map(t -> t.getType() == CategoryType.EXPENSE
-                            ? t.getAmount().negate()
-                            : t.getAmount())
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            totalLabel.setText("Total: " + total + " €");
-
-            String color;
-            int sign = total.compareTo(BigDecimal.ZERO);
-            if (sign > 0) {
-                color = "#2e7d32"; // green for income surplus
-            } else if (sign < 0) {
-                color = "#c62828"; // red for expense dominance
-            } else {
-                color = "#aaaaaa"; // neutral for zero
-            }
-            totalLabel.setStyle("-fx-text-fill: " + color + ";");
         } catch (Exception e) {
             e.printStackTrace();
         }

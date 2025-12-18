@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import sk.upjs.ics.spendwise.entity.Account;
@@ -30,6 +31,7 @@ public class DashboardController {
     @FXML private PieChart expenseChart;
     @FXML private VBox emptyStateBox;
     @FXML private ComboBox<Account> accountSelector;
+    @FXML private Label totalLabel;
 
     @FXML private Button langEnBtn;
     @FXML private Button langSkBtn;
@@ -142,6 +144,8 @@ public class DashboardController {
                         .collect(Collectors.toList());
             }
 
+            updateTotalLabel(selectedAccount, transactions);
+
             List<Transaction> expensesOnly = transactions.stream()
                     .filter(t -> t.getType() == CategoryType.EXPENSE)
                     .toList();
@@ -172,6 +176,35 @@ public class DashboardController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateTotalLabel(Account selectedAccount, List<Transaction> transactions) {
+        boolean showTotal = selectedAccount.getId() != -1L;
+        totalLabel.setVisible(showTotal);
+        totalLabel.setManaged(showTotal);
+
+        if (!showTotal) {
+            return;
+        }
+
+        BigDecimal total = transactions.stream()
+                .map(t -> t.getType() == CategoryType.EXPENSE
+                        ? t.getAmount().negate()
+                        : t.getAmount())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        totalLabel.setText(resources.getString("dashboard.total_prefix") + " " + total + " €");
+
+        String color;
+        int sign = total.compareTo(BigDecimal.ZERO);
+        if (sign > 0) {
+            color = "#2e7d32";
+        } else if (sign < 0) {
+            color = "#c62828";
+        } else {
+            color = "#aaaaaa";
+        }
+        totalLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 18px;");
     }
 
     @FXML void showAccounts(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts"); }
