@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional; // ОБЯЗАТЕЛЬНО
 
 public class JdbcTransactionDao implements TransactionDao {
 
@@ -26,6 +27,7 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public List<Transaction> getAll(Long userId) {
+        // Достаем тип категории (INCOME/EXPENSE) через JOIN
         String sql = """
             SELECT 
                 t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,
@@ -41,7 +43,7 @@ public class JdbcTransactionDao implements TransactionDao {
     }
 
     @Override
-    public Transaction getById(Long id) {
+    public Optional<Transaction> getById(Long id) { // Возвращаем Optional
         String sql = """
             SELECT 
                 t.id, t.amount, t.occurred_at, t.note, t.account_id, t.category_id,
@@ -53,9 +55,10 @@ public class JdbcTransactionDao implements TransactionDao {
             WHERE t.id = ?
         """;
         try {
-            return jdbcTemplate.queryForObject(sql, new TransactionMapper(), id);
+            Transaction t = jdbcTemplate.queryForObject(sql, new TransactionMapper(), id);
+            return Optional.ofNullable(t);
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -75,17 +78,15 @@ public class JdbcTransactionDao implements TransactionDao {
                 return ps;
             }, keyHolder);
             t.setId(((Number) keyHolder.getKeys().get("id")).longValue());
-        } else {
-            // Тут можно добавить UPDATE логику, если нужно
         }
         return t;
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Long id) { // Возвращаем boolean
         String sql = "DELETE FROM txn WHERE id = ?";
-        int changed = jdbcTemplate.update(sql, id);
-        return changed > 0;
+        int rows = jdbcTemplate.update(sql, id);
+        return rows > 0;
     }
 
     private static class TransactionMapper implements RowMapper<Transaction> {
@@ -103,10 +104,14 @@ public class JdbcTransactionDao implements TransactionDao {
             t.setAccountName(rs.getString("account_name"));
             t.setCategoryName(rs.getString("category_name"));
 
-            // ИСПРАВЛЕНИЕ: Конвертируем строку в Enum
+            // ПРЕВРАЩАЕМ СТРОКУ "EXPENSE" В ENUM
             String typeStr = rs.getString("category_type");
             if (typeStr != null) {
-                t.setType(CategoryType.valueOf(typeStr));
+                try {
+                    t.setType(CategoryType.valueOf(typeStr));
+                } catch (IllegalArgumentException e) {
+                    t.setType(CategoryType.EXPENSE);
+                }
             }
 
             return t;

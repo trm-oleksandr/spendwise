@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import sk.upjs.ics.spendwise.entity.Account;
+import sk.upjs.ics.spendwise.entity.CategoryType; // ВАЖНЫЙ ИМПОРТ
 import sk.upjs.ics.spendwise.entity.Transaction;
 import sk.upjs.ics.spendwise.service.AccountService;
 import sk.upjs.ics.spendwise.service.TransactionService;
@@ -34,20 +35,17 @@ public class DashboardController {
     public void initialize() {
         setupAccountSelector();
 
-        // Слушатель выбора
         accountSelector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 loadChartData(newVal);
             }
         });
 
-        // Выбираем первый пункт сразу
         accountSelector.getSelectionModel().selectFirst();
     }
 
     private void setupAccountSelector() {
         List<Account> userAccounts = accountService.getAll(currentUserId);
-
         Account allAccountsOption = new Account();
         allAccountsOption.setId(-1L);
         allAccountsOption.setName("All Accounts");
@@ -57,14 +55,11 @@ public class DashboardController {
         options.addAll(userAccounts);
 
         accountSelector.setItems(options);
-
-        // Красивое отображение имен в списке
         accountSelector.setConverter(new StringConverter<Account>() {
             @Override
             public String toString(Account account) {
                 return account == null ? "" : account.getName();
             }
-
             @Override
             public Account fromString(String string) {
                 return null;
@@ -74,40 +69,33 @@ public class DashboardController {
 
     private void loadChartData(Account selectedAccount) {
         try {
-            System.out.println("--- Loading Chart Data for: " + selectedAccount.getName() + " (ID: " + selectedAccount.getId() + ") ---");
-
-            // 1. Берем ВСЕ транзакции
+            System.out.println("--- Loading Chart Data ---");
             List<Transaction> transactions = transactionService.getAll(currentUserId);
-            System.out.println("Total transactions found: " + transactions.size());
 
-            // 2. Фильтруем по счету
+            // 1. Фильтр по аккаунту
             if (selectedAccount.getId() != -1L) {
                 transactions = transactions.stream()
                         .filter(t -> t.getAccountId().equals(selectedAccount.getId()))
                         .collect(Collectors.toList());
             }
-            System.out.println("Transactions for this account: " + transactions.size());
 
-            // 3. Оставляем ТОЛЬКО РАСХОДЫ (EXPENSE)
+            // 2. ИСПРАВЛЕННЫЙ ФИЛЬТР: Сравниваем Enum с Enum
             List<Transaction> expensesOnly = transactions.stream()
-                    .filter(t -> "EXPENSE".equals(t.getType()))
+                    .filter(t -> t.getType() == CategoryType.EXPENSE)
                     .toList();
 
-            System.out.println("Expenses only: " + expensesOnly.size());
+            System.out.println("Found expenses: " + expensesOnly.size());
 
-            // 4. Отображаем
             if (expensesOnly.isEmpty()) {
-                System.out.println("Result: EMPTY (Showing placeholder)");
                 expenseChart.setVisible(false);
                 emptyStateBox.setVisible(true);
                 return;
             }
 
-            System.out.println("Result: SHOW GRAPH");
             expenseChart.setVisible(true);
             emptyStateBox.setVisible(false);
 
-            // 5. Группируем
+            // 3. Группируем
             Map<String, BigDecimal> expensesByCategory = expensesOnly.stream()
                     .filter(t -> t.getCategoryName() != null)
                     .collect(Collectors.toMap(
@@ -128,23 +116,8 @@ public class DashboardController {
         }
     }
 
-    @FXML
-    void showAccounts(ActionEvent event) {
-        SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts");
-    }
-
-    @FXML
-    void logout(ActionEvent event) {
-        SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login");
-    }
-
-    @FXML
-    void showCategories(ActionEvent event) {
-        SceneSwitcher.switchScene(event, "/ui/categories.fxml", "Manage Categories");
-    }
-
-    @FXML
-    void showTransactions(ActionEvent event) {
-        SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions");
-    }
+    @FXML void showAccounts(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/accounts.fxml", "Accounts"); }
+    @FXML void logout(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/login.fxml", "Login"); }
+    @FXML void showCategories(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/categories.fxml", "Manage Categories"); }
+    @FXML void showTransactions(ActionEvent event) { SceneSwitcher.switchScene(event, "/ui/transactions.fxml", "Transactions"); }
 }
