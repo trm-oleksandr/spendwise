@@ -31,8 +31,6 @@
                     <ComboBox fx:id="accountSelector" prefWidth="200.0" promptText="%dashboard.all_accounts" />
                 </HBox>
 
-                <Label fx:id="totalLabel" alignment="CENTER" style="-fx-text-fill: #aaaaaa; -fx-font-size: 18px;" text="Total: 0.00 €" visible="false" />
-
                 <StackPane VBox.vgrow="ALWAYS">
                     <children>
                         <PieChart fx:id="expenseChart" legendSide="BOTTOM" title="" visible="false" />
