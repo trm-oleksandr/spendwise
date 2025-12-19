@@ -6,13 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AppConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
     private static final String PROPERTIES_FILE = "db.properties";
     private static volatile AppConfig instance;
 
@@ -29,7 +26,6 @@ public class AppConfig {
 
         this.dataSource = new HikariDataSource(hikariConfig);
         this.jdbcTemplate = new JdbcTemplate(this.dataSource);
-        logger.info("HikariDataSource and JdbcTemplate initialized successfully");
     }
 
     public static AppConfig getInstance() {
@@ -49,7 +45,6 @@ public class AppConfig {
 
     public void close() {
         if (dataSource != null) {
-            logger.info("Closing HikariDataSource");
             dataSource.close();
         }
     }
@@ -62,7 +57,6 @@ public class AppConfig {
             }
             properties.load(inputStream);
         } catch (IOException e) {
-            logger.error("Failed to load {}", PROPERTIES_FILE, e);
             throw new IllegalStateException("Could not load " + PROPERTIES_FILE, e);
         }
 
