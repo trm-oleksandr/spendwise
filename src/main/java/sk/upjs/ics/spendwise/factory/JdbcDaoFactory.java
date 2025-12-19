@@ -18,7 +18,7 @@ public enum JdbcDaoFactory implements DaoFactory {
 
     private final JdbcTemplate jdbcTemplate;
 
-    // Кешируем DAO
+    // Кешируем
     private JdbcUserDao userDao;
     private JdbcAccountDao accountDao;
     private JdbcCategoryDao categoryDao;
